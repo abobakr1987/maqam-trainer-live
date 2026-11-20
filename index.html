@@ -350,8 +350,8 @@
           </p>
 
           <div class="row" style="margin-top:.8rem">
-            <button type="button" class="btn-accent" id="btn-mic" aria-label="بدء الاستماع بالمايك">🎤 ابدأ الاستماع</button>
-            <button type="button" class="btn-ghost" id="btn-test-tone" aria-label="جرّب بصوت تجريبي">🔊 جرّب بصوت تجريبي</button>
+            <button type="button" class="btn-accent" id="btn-mic" data-mic-start aria-label="بدء الاستماع بالمايك">🎤 ابدأ الاستماع</button>
+            <button type="button" class="btn-ghost" id="btn-test-tone" data-mic-start aria-label="جرّب بصوت تجريبي">🔊 جرّب بصوت تجريبي</button>
           </div>
           <p class="tiny dim" style="margin:.4rem 0 0">
             «جرّب بصوت تجريبي» بيشغّل النغمة المطلوبة من سماعة الموبايل والمايك بيسمعها — لو المدرب لقطها وعدّاها صح، يبقى اللايف شغال تمام من غير ما تعزف.
@@ -360,7 +360,12 @@
           <p class="alert-err hidden" id="mic-error" role="alert" style="margin-top:.75rem"></p>
 
           <div id="live-ui" class="hidden" style="margin-top:.9rem">
-            <div class="meter" aria-label="مؤشر مستوى صوت المايك"><div id="level-fill"></div></div>
+            <div class="alt-box" style="text-align:center;border:1px solid var(--accent)" aria-label="اختبار المايك الذاتي">
+              <p class="tiny dim" style="margin:0">🎙 اختبار المايك — النغمة اللي المايك سامعها منك دلوقتي</p>
+              <p id="mic-live-note" dir="ltr" style="margin:.15rem 0 0;font-size:2.6rem;font-weight:700;line-height:1.15">—</p>
+              <p class="small" id="mic-selftest" role="status" style="margin:.15rem 0 0;font-weight:700">المايك فتح — اتكلم أو اعزف وهتشوف اسم النغمة ومستوى صوتك هنا على طول</p>
+            </div>
+            <div class="meter" aria-label="مؤشر مستوى صوت المايك" style="margin-top:.6rem"><div id="level-fill"></div></div>
             <p class="tiny dim" id="level-text" style="margin:.3rem 0 0">المايك مفتوح بس مش سامع صوت لسه — اعزف نغمة وشوف المؤشر بيتحرك ولا لأ</p>
             <p class="tiny hidden" id="nosound-note" style="margin:.3rem 0 0;color:var(--warn)"></p>
           </div>
@@ -479,7 +484,7 @@
             التحليل بيتم على جهازك وصوتك مش بيتبعت لأي مكان.
           </p>
           <div class="row" style="margin-top:.8rem">
-            <button type="button" class="btn-accent" id="btn-analyzer" aria-label="بدء التحليل اللايف">🎤 ابدأ التحليل اللايف</button>
+            <button type="button" class="btn-accent" id="btn-analyzer" data-mic-start aria-label="بدء التحليل اللايف">🎤 ابدأ التحليل اللايف</button>
             <button type="button" class="btn-ghost" id="btn-analyzer-clear" aria-label="مسح تحليل النغمات">🗑 امسح وابدأ من جديد</button>
           </div>
           <p class="alert-err hidden" id="an-error" role="alert" style="margin-top:.75rem"></p>
@@ -941,7 +946,9 @@
       return pool;
     }
 
-    function unlockAudio() {
+    /* تجهيز عناصر الوسائط بس — من غير إنشاء أي AudioContext.
+       ده آمن قبل/بعد طلب المايك لأنه مش بيلمس مسار getUserMedia. */
+    function primeMediaPool() {
       try {
         if (navigator.audioSession && navigator.audioSession.type !== "playback") {
           navigator.audioSession.type = "playback";
@@ -961,10 +968,33 @@
           } catch (e) { poolPrimed = false; }
         });
       }
+    }
+
+    function unlockAudio() {
+      primeMediaPool();
       try {
         var ac = getAudio();
         if (ac.state !== "running") ac.resume().catch(function(){});
       } catch (e) { /* المايك هيحاول تاني لوحده */ }
+    }
+
+    /* سياق صوت خاص بالمايك بس: بيتعمل بعد ما إذن المايك يتاخد فعلًا،
+       ومش بيشارك سياق التشغيل — زي ما تطبيقات اللايف (Yousician وغيرها) بتعمل:
+       الطلب الأول للمايك وبأبسط إعدادات، وبعدين المعالجة. */
+    function createMicContext() {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      var ac = new AC();
+      if (ac.state !== "running") { return ac.resume().catch(function(){}).then(function() { return ac; }); }
+      return Promise.resolve(ac);
+    }
+    function closeMicContext(holder) {
+      try {
+        if (holder.analyser) { try { holder.analyser.disconnect(); } catch (e) {} holder.analyser = null; }
+        if (holder.ac) {
+          var ac = holder.ac; holder.ac = null;
+          if (ac.state !== "closed") ac.close().catch(function(){});
+        }
+      } catch (e) { /* أفضل جهد للإغلاق */ }
     }
 
     function playTone(midiFloat, dur, when, volume) {
@@ -1377,52 +1407,65 @@
       else micErrorEl.classList.add("hidden");
     }
 
+    /* اسم الخطأ الحقيقي زي ما المتصفح قاله — بيظهر للمستخدم دايمًا عشان
+       التشخيص يبقى محدد مش «المايك مافتحش» وخلاص. */
+    function micErrorName(e) {
+      if (!e) return "UnknownError";
+      if (e.message === "mic-unavailable") return "mic-unavailable";
+      return e.name || "Error";
+    }
     function micErrorMessage(e) {
-      var name = (e && e.name) || "";
+      var name = micErrorName(e);
       var msg = (e && e.message) || "";
-      if (msg === "mic-unavailable") {
-        return "المتصفح اللي فاتح الصفحة دي مش بيدعم المايك الحي أصلًا — عشان كده مفيش طلب إذن بيظهر. ده بيحصل جوه المتصفحات اللي جوه التطبيقات. الحل: افتح الصفحة دي في متصفح Safari نفسه (شوف الخطوات فوق) وهناك هيظهر طلب الإذن والمايك هيشتغل لايف.";
+      var explain;
+      if (msg === "mic-unavailable" || name === "mic-unavailable") {
+        explain = "المتصفح اللي فاتح الصفحة دي مش بيدعم المايك الحي أصلًا — عشان كده مفيش طلب إذن بيظهر. ده بيحصل جوه المتصفحات اللي جوه التطبيقات. الحل: افتح الصفحة دي في متصفح Safari نفسه (شوف الخطوات فوق) وهناك هيظهر طلب الإذن والمايك هيشتغل لايف.";
+      } else if (name === "NotAllowedError") {
+        explain = "إذن المايك اترفض — يا إما دوست «عدم السماح» قبل كده يا إما إعدادات الموقع قافلاه. الحل: في Safari دوس «aA» في شريط العنوان ← إعدادات الموقع ← المايكروفون ← سماح، أو الإعدادات ← Safari ← المايكروفون، وبعدين دوس «ابدأ الاستماع» تاني.";
+      } else if (name === "SecurityError") {
+        explain = "المتصفح منع المايك لأسباب أمان — غالبًا الصفحة مش مفتوحة من عنوان آمن (https) أو مفتوحة جوه إطار/تطبيق تاني. الحل: افتح الصفحة مباشرة في Safari من عنوانها الأصلي ودوس «ابدأ الاستماع» تاني.";
+      } else if (name === "NotFoundError" || name === "DevicesNotFoundError") {
+        explain = "المتصفح مش لاقي مايكروفون متاح على الجهاز. الحل: افصل أي سماعة بلوتوث أو جهاز صوت تاني واخد المايك، واتأكد إن مفيش تطبيق تاني فاتح المايك، وبعدين حاول تاني.";
+      } else if (name === "OverconstrainedError" || name === "ConstraintNotSatisfiedError") {
+        explain = "المتصفح رفض إعدادات صوت مطلوبة لأنه مش بيدعمها — الصفحة بقت تطلب المايك بأبسط إعدادات ({audio:true}) فالمفروض ما تحصلش؛ لو ظهرت تاني، حدّث Safari وحاول مرة كمان.";
+      } else if (name === "NotReadableError" || name === "TrackStartError") {
+        explain = "المايك موجود بس مش قادر يفتح — غالبًا تطبيق تاني بيستخدمه دلوقتي (مكالمة، تسجيل، كاميرا). الحل: اقفل التطبيق التاني خالص وحاول تاني.";
+      } else if (name === "AbortError") {
+        explain = "طلب المايك اتلغى قبل ما يكمّل. الحل: دوس «ابدأ الاستماع» وحاول تاني وسيب طلب الإذن يظهر لحد ما ترد عليه.";
+      } else if (name === "TypeError") {
+        explain = "طلب المايك اتبعت بصيغة المتصفح مش فاهمها. الحل: حدّث Safari لآخر إصدار وحاول تاني — الصفحة بتطلب المايك دلوقتي بأبسط صيغة ممكنة.";
+      } else {
+        explain = "حصلت مشكلة في فتح المايك. اتأكد إنك فاتح الصفحة في Safari نفسه وإن إذن المايك مسموح، وحاول تاني — صوتك بيتحلّل على جهازك ومش بيتبعت لأي مكان.";
       }
-      if (msg === "mic-timeout") {
-        return "المتصفح ماردّش على طلب المايك. لو انت جوه متصفح تطبيق تاني، افتح الصفحة في Safari نفسه. ولو انت في Safari فعلًا، اقفل أي تطبيق بيستخدم المايك وحاول تاني.";
-      }
-      if (name === "NotAllowedError" || name === "SecurityError") {
-        return "إذن المايك اترفض. لو عايز تفعّله: الإعدادات > Safari > المايكروفون، أو دوس على «aA» في شريط العنوان في Safari واختر إعدادات الموقع واسمح بالمايك، وبعدين حاول تاني.";
-      }
-      if (name === "NotFoundError" || name === "DevicesNotFoundError") {
-        return "مش لاقي مايكروفون متاح على الجهاز. اتأكد إن مفيش سماعة أو جهاز تاني واخد المايك، وحاول تاني.";
-      }
-      if (name === "NotReadableError" || name === "TrackStartError") {
-        return "المايك مشغول أو مش قادر يفتح — ممكن تطبيق تاني بيستخدمه دلوقتي. اقفله وحاول تاني.";
-      }
-      if (name === "AbortError") {
-        return "طلب المايك اتلغى قبل ما يكمّل. دوس «ابدأ الاستماع» وحاول تاني.";
-      }
-      return "حصلت مشكلة في فتح المايك. اتأكد إنك فاتح الصفحة في Safari وإن إذن المايك مسموح، وحاول تاني — صوتك بيتحلّل على جهازك ومش بيتبعت لأي مكان.";
+      return "خطأ المايك: " + name + " — " + explain;
     }
 
+    /* طلب المايك على طريقة تطبيقات اللايف: النداء ده لازم يحصل مباشرة جوه
+       معالج الدوسة وبأبسط إعدادات ممكنة { audio: true } — من غير أي
+       AudioContext ولا تشغيل صوت ولا await قبله. ولو الطلب البسيط وقع
+       بخطأ قيود/جهاز، بنعيد المحاولة مرة واحدة بنفس الإعدادات البسيطة
+       عبر واجهة getUserMedia القديمة كاحتياطي أخير. ومفيش مهلة زمنية
+       بتقتل الطلب: نافذة إذن iOS ممكن تفضل مفتوحة لحد ما المستخدم يرد. */
     function requestMicStream() {
       var md = navigator.mediaDevices;
       if (!md || typeof md.getUserMedia !== "function") {
+        var legacy = navigator.getUserMedia || navigator.webkitGetUserMedia;
+        if (typeof legacy === "function") {
+          return new Promise(function(resolve, reject) {
+            legacy.call(navigator, { audio: true }, resolve, reject);
+          });
+        }
         return Promise.reject(new Error("mic-unavailable"));
       }
-      var timedOut = false;
-      var attempt = (async function() {
-        try {
-          return await md.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
-        } catch (e) {
-          if (e && (e.name === "OverconstrainedError" || e.name === "TypeError")) {
-            return await md.getUserMedia({ audio: true });
+      return md.getUserMedia({ audio: true }).catch(function(e) {
+        var n = e && e.name;
+        if (n === "OverconstrainedError" || n === "NotFoundError" || n === "DevicesNotFoundError" || n === "TypeError") {
+          var legacy2 = navigator.getUserMedia || navigator.webkitGetUserMedia;
+          if (typeof legacy2 === "function") {
+            return new Promise(function(resolve, reject) {
+              legacy2.call(navigator, { audio: true }, resolve, function() { reject(e); });
+            });
           }
-          throw e;
-        }
-      })();
-      var timeout = new Promise(function(_, reject) {
-        setTimeout(function() { timedOut = true; reject(new Error("mic-timeout")); }, 10000);
-      });
-      return Promise.race([attempt, timeout]).catch(function(e) {
-        if (timedOut) {
-          attempt.then(function(s) { s.getTracks().forEach(function(t) { t.stop(); }); }).catch(function(){});
         }
         throw e;
       });
@@ -1441,6 +1484,14 @@
       coach.level = rms;
       levelFill.style.width = Math.min(100, Math.round(rms * 400)) + "%";
       levelFill.style.background = rms >= 0.015 ? "#4caf7d" : "#7a6a4f";
+      var selftestEl = el("mic-selftest");
+      if (selftestEl) {
+        var pct = Math.min(100, Math.round(rms * 400));
+        selftestEl.textContent = rms >= 0.015
+          ? "✅ المايك سامعك — مستوى صوتك دلوقتي " + pct + "٪"
+          : "المايك مفتوح وبيسمع… اتكلم أو اعزف نغمة عشان تتأكد إنه سامعك";
+        selftestEl.style.color = rms >= 0.015 ? "var(--good)" : "";
+      }
       if (rms >= 0.015) {
         coach.heard = true;
         levelText.textContent = "المايك سامع صوت دلوقتي 🔊 — المؤشر ده بيتحرك مع عزفك";
@@ -1516,10 +1567,13 @@
       cancelAnimationFrame(coach.raf);
       if (coach.stream) coach.stream.getTracks().forEach(function(t) { t.stop(); });
       coach.stream = null;
+      closeMicContext(coach);
       coach.listening = false;
+      coach.starting = false;
       coach.detected = null; coach.freq = null; coach.level = 0;
       coach.smoother.reset();
       liveUi.classList.add("hidden");
+      micBtn.disabled = false;
       micBtn.textContent = "🎤 ابدأ الاستماع";
       micBtn.className = "btn-accent";
       setMicStatus("idle", "المايك واقف");
@@ -1527,21 +1581,27 @@
     }
 
     function startCoach() {
+      /* أول حاجة جوه الدوسة: طلب المايك نفسه، بأبسط إعدادات، ومن غير أي
+         AudioContext أو تشغيل صوت قبله — ده ترتيب Yousician على iOS. */
+      if (coach.listening || coach.starting) return;
       showMicError(null);
-      if (!window.isSecureContext || !navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== "function") {
+      if (!window.isSecureContext || (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== "function") && typeof (navigator.getUserMedia || navigator.webkitGetUserMedia) !== "function") {
         setMicStatus("err", "المايك الحي غير مدعوم هنا");
         showMicError(micErrorMessage(new Error("mic-unavailable")));
         document.getElementById("safari-banner").scrollIntoView({ behavior: "smooth", block: "center" });
         return;
       }
+      /* مايك واحد بس في الصفحة كلها: وقّف المحلل قبل ما تطلب ستريم جديد */
+      if (typeof stopAnalyzer === "function" && typeof analyzer !== "undefined" && analyzer && (analyzer.listening || analyzer.starting)) stopAnalyzer();
       coach.starting = true;
+      var streamPromise = requestMicStream();
       micBtn.disabled = true;
       micBtn.textContent = "⏳ بيطلب إذن المايك…";
       setMicStatus("idle", "بيطلب إذن المايك…");
-      requestMicStream().then(function(stream) {
+      streamPromise.then(function(stream) {
         coach.stream = stream;
-        var ac = getAudio();
-        return ac.resume().catch(function(){}).then(function() { return ac; });
+        /* السياق بيتعمل دلوقتي بس — بعد ما الستريم اتاخد فعلًا */
+        return createMicContext();
       }).then(function(ac) {
         coach.ac = ac;
         var source = ac.createMediaStreamSource(coach.stream);
@@ -1564,31 +1624,33 @@
       }).catch(function(e) {
         if (coach.stream) coach.stream.getTracks().forEach(function(t) { t.stop(); });
         coach.stream = null;
+        closeMicContext(coach);
         coach.listening = false;
         micBtn.disabled = false;
         micBtn.textContent = "🎤 ابدأ الاستماع";
         micBtn.className = "btn-accent";
-        setMicStatus("err", "المايك مافتحش");
+        setMicStatus("err", "⚠ " + micErrorName(e));
         showMicError(micErrorMessage(e));
       }).then(function() { coach.starting = false; });
     }
 
     micBtn.addEventListener("click", function() {
-      unlockAudio();
       if (coach.listening) stopCoach();
-      else if (!coach.starting) startCoach();
+      else startCoach();
     });
 
-    /* صوت تجريبي: يشغّل النغمة المطلوبة من السماعة والمايك يلقطها */
+    /* صوت تجريبي: يشغّل النغمة المطلوبة من السماعة والمايك يلقطها.
+       المايك بيُطلب الأول جوه الدوسة، وتجهيز عناصر الصوت بييجي بعده. */
     el("btn-test-tone").addEventListener("click", function() {
-      unlockAudio();
       var t = currentTarget();
       var midi = t ? t.midi : 60;
       function fire() { playTone(midi, 1.4, 0, 0.3); }
       if (!coach.listening && !coach.starting) {
         startCoach();
-        setTimeout(fire, 900);
+        primeMediaPool();
+        setTimeout(fire, 1200);
       } else {
+        primeMediaPool();
         fire();
       }
     });
@@ -1680,6 +1742,8 @@
       el("detected-name").textContent = coach.detected != null
         ? (sequenceMode ? detectedName : englishNoteName(coach.detected))
         : "—";
+      var liveNoteEl = el("mic-live-note");
+      if (liveNoteEl) liveNoteEl.textContent = coach.detected != null ? englishNoteName(coach.detected) : "—";
       el("detected-freq").textContent = coach.freq ? Math.round(coach.freq) + " هرتز" : "مفيش صوت";
 
       var box = el("verdict-box"), label = el("verdict-label"), detail = el("verdict-detail");
@@ -2251,7 +2315,7 @@
         "<div id='cr-turn' class='hidden' style='margin-top:.8rem;background:var(--good-bg);border-radius:.75rem;padding:.9rem;text-align:center'>" +
           "<p style='margin:0;font-size:1.15rem;font-weight:700;color:var(--good)'>🎤 دورك دلوقتي! غنّي نفس النغمات بصوتك</p>" +
           "<p class='small' style='margin:.3rem 0 0;color:#bfe9d2'>دوس الزرار والمايك هيفتح ويسمعك نغمة نغمة ويصححك فوق في المدرب. غلطت؟ دوس «قولي يا مدرب» واسمع وجرّب تاني.</p>" +
-          "<button type='button' class='btn-accent' id='cr-sing' style='margin-top:.6rem;background:var(--good);color:#12291d'>🎤 ابدأ دوري — غنّي بالمايك</button>" +
+          "<button type='button' class='btn-accent' id='cr-sing' data-mic-start style='margin-top:.6rem;background:var(--good);color:#12291d'>🎤 ابدأ دوري — غنّي بالمايك</button>" +
         "</div>";
       var coachCard = el("coach-card");
       coachCard.parentNode.insertBefore(card, coachCard.nextSibling);
@@ -2282,7 +2346,6 @@
       });
 
       el("cr-sing").addEventListener("click", function() {
-        unlockAudio();
         var data = crData();
         var m = maqamById(cr.maqamId);
         setCoachConfig({ title: "غنّي ورايا: " + data.title + " (" + m.name + ")", targets: data.targets, voice: true });
@@ -2455,7 +2518,7 @@
           "<div id='sing-turn' class='hidden' style='margin-top:.8rem;background:var(--good-bg);border-radius:.75rem;padding:.85rem'>" +
             "<p style='margin:0;font-weight:700;color:var(--good)'>🎤 دورك! غنّي نفس الخطوة ورا المدرب</p>" +
             "<p class='small' style='margin:.3rem 0 0;color:#bfe9d2'>دوس الزرار والمايك اللايف هيفتح في المدرب فوق ويسمعك نغمة نغمة ويصححك بالسنت. غلطت؟ ارجع هنا وعيد سماع الخطوة.</p>" +
-            "<button type='button' class='btn-accent' id='sing-sing-step' style='margin-top:.6rem;background:var(--good);color:#12291d'>🎤 دوري — أغنّي وراه بالمايك</button>" +
+            "<button type='button' class='btn-accent' id='sing-sing-step' data-mic-start style='margin-top:.6rem;background:var(--good);color:#12291d'>🎤 دوري — أغنّي وراه بالمايك</button>" +
           "</div>" +
         "</div>";
       el("sing-play-lesson").addEventListener("click", function() {
@@ -2468,7 +2531,6 @@
         el("sing-stage-note").textContent = "🎤";
       });
       el("sing-sing-step").addEventListener("click", function() {
-        unlockAudio();
         var lesson = singLesson(), m = singMaqam();
         var idx = sing.stepIdx >= 0 ? sing.stepIdx : 0;
         var step = lesson.steps[idx];
@@ -2506,14 +2568,13 @@
           "<span class='small dim' style='display:block;margin-top:.15rem'>" + esc(step.say) + "</span>" +
           "<span class='row' style='margin-top:.45rem'>" +
             "<button type='button' class='chip-btn' data-sing-act='listen'>🗣️ اسمعها متغنّية</button>" +
-            "<button type='button' class='chip-btn' data-sing-act='sing'>🎤 أغنّي وراها</button>" +
+            "<button type='button' class='chip-btn' data-sing-act='sing' data-mic-start>🎤 أغنّي وراها</button>" +
           "</span></span>";
         row.querySelector("[data-sing-act='listen']").addEventListener("click", function() {
           unlockAudio();
           playSingStep(i, null);
         });
         row.querySelector("[data-sing-act='sing']").addEventListener("click", function() {
-          unlockAudio();
           sing.stepIdx = i;
           renderSingSteps();
           setCoachConfig({
@@ -3029,30 +3090,36 @@
     function stopAnalyzer() {
       cancelAnimationFrame(analyzer.raf);
       if (analyzer.stream) analyzer.stream.getTracks().forEach(function(t) { t.stop(); });
-      analyzer.stream = null; analyzer.listening = false; analyzer.detected = null; analyzer.freq = null;
+      analyzer.stream = null;
+      closeMicContext(analyzer);
+      analyzer.listening = false; analyzer.starting = false; analyzer.detected = null; analyzer.freq = null;
       analyzer.smoother.reset();
       anLiveEl.classList.add("hidden");
+      anBtn.disabled = false;
       anBtn.textContent = "🎤 ابدأ التحليل اللايف";
       anBtn.className = "btn-accent";
       anSetStatus("idle", "المحلل واقف");
       renderAnalyzer();
     }
     function startAnalyzer() {
+      /* نفس ترتيب المدرب: طلب المايك أول حاجة جوه الدوسة وبأبسط إعدادات،
+         والسياق الصوتي بعد ما الستريم يتاخد — لا قبله. */
+      if (analyzer.listening || analyzer.starting) return;
       anShowError(null);
-      if (!window.isSecureContext || !navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== "function") {
+      if (!window.isSecureContext || (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== "function") && typeof (navigator.getUserMedia || navigator.webkitGetUserMedia) !== "function") {
         anSetStatus("err", "المايك الحي غير مدعوم هنا");
         anShowError(micErrorMessage(new Error("mic-unavailable")) + " افتح تبويب «المدرب اللايف» فوق عشان تشوف خطوات فتح الصفحة في Safari بالتفصيل.");
         return;
       }
-      if (typeof stopCoach === "function" && coach.listening) stopCoach();
+      if (typeof stopCoach === "function" && (coach.listening || coach.starting)) stopCoach();
       analyzer.starting = true;
+      var streamPromise = requestMicStream();
       anBtn.disabled = true;
       anBtn.textContent = "⏳ بيطلب إذن المايك…";
       anSetStatus("idle", "بيطلب إذن المايك…");
-      requestMicStream().then(function(stream) {
+      streamPromise.then(function(stream) {
         analyzer.stream = stream;
-        var ac = getAudio();
-        return ac.resume().catch(function(){}).then(function() { return ac; });
+        return createMicContext();
       }).then(function(ac) {
         analyzer.ac = ac;
         var source = ac.createMediaStreamSource(analyzer.stream);
@@ -3070,18 +3137,19 @@
         analyzer.raf = requestAnimationFrame(analyzerLoop);
       }).catch(function(e) {
         if (analyzer.stream) analyzer.stream.getTracks().forEach(function(t) { t.stop(); });
-        analyzer.stream = null; analyzer.listening = false;
+        analyzer.stream = null;
+        closeMicContext(analyzer);
+        analyzer.listening = false;
         anBtn.disabled = false;
         anBtn.textContent = "🎤 ابدأ التحليل اللايف";
         anBtn.className = "btn-accent";
-        anSetStatus("err", "المايك مافتحش");
+        anSetStatus("err", "⚠ " + micErrorName(e));
         anShowError(micErrorMessage(e));
       }).then(function() { analyzer.starting = false; });
     }
     anBtn.addEventListener("click", function() {
-      unlockAudio();
       if (analyzer.listening) stopAnalyzer();
-      else if (!analyzer.starting) startAnalyzer();
+      else startAnalyzer();
     });
     var gotoAn = el("btn-goto-analyzer");
     if (gotoAn) gotoAn.addEventListener("click", function() { showTab("analyzer"); });
@@ -3094,8 +3162,16 @@
     renderAnalyzer();
 
     /* ════════════════ التهيئة ════════════════ */
-    window.addEventListener("pointerdown", unlockAudio);
-    window.addEventListener("touchend", unlockAudio);
+    /* فتح الصوت العام بيتخطّى أزرار تشغيل المايك خالص: أي دوسة على زرار
+       مايك لازم توصل لـ getUserMedia مباشرة من غير ما يتعمل أو يتصحّى
+       أي AudioContext قبل الإذن — غير كده Safari على iOS بيحجب الطلب. */
+    function globalUnlock(e) {
+      var t = e && e.target;
+      if (t && typeof t.closest === "function" && t.closest("[data-mic-start]")) return;
+      unlockAudio();
+    }
+    window.addEventListener("pointerdown", globalUnlock);
+    window.addEventListener("touchend", globalUnlock);
 
     renderMaqamPicker();
     renderMaqamDetail();
