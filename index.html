@@ -1,0 +1,3122 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="مدرب المقامات لايف" />
+    <link rel="icon" href="data:," />
+    <title>مدرب المقامات والبيانو لايف</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f3ead3;
+        --surface: #fdf8ec;
+        --surface-alt: #efe4c8;
+        --text: #241a10;
+        --dim: #7a6a4f;
+        --border: #ddd0ac;
+        --accent: #a87f14;
+        --accent-ink: #171008;
+        --good-bg: #1e4634; --good: #7fe0ae;
+        --warn-bg: #4d3a10; --warn: #ffd166;
+        --bad-bg: #55201a;  --bad: #ff9d8f;
+        --idle-bg: #2a2016; --idle: #b8a888;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #171008;
+          --surface: #241a10;
+          --surface-alt: #2e2115;
+          --text: #f3ead3;
+          --dim: #b8a888;
+          --border: #453322;
+          --accent: #c9a227;
+        }
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: "IBM Plex Sans Arabic", system-ui, sans-serif;
+        font-size: 16px;
+        line-height: 1.55;
+      }
+      .font-display { font-family: "Amiri", serif; }
+      button, [role="button"], select, summary, input:not([type="checkbox"], [type="radio"]) { min-height: 2.25rem; }
+      button { font-family: inherit; cursor: pointer; }
+      button:disabled { opacity: .65; cursor: default; }
+
+      .wrap { max-width: 48rem; margin: 0 auto; padding: 0 1rem 2.5rem; }
+
+      /* ── Tab bar ── */
+      .tabbar {
+        position: sticky; top: 0; z-index: 30;
+        background: color-mix(in srgb, var(--bg) 94%, transparent);
+        backdrop-filter: blur(6px);
+        border-bottom: 1px solid var(--border);
+        padding-top: env(safe-area-inset-top);
+      }
+      .tabbar nav {
+        max-width: 48rem; margin: 0 auto; padding: .5rem .75rem;
+        display: flex; flex-wrap: wrap; gap: .25rem;
+      }
+      .tab-btn {
+        min-height: 2.75rem; padding: .35rem .9rem; border: 0; border-radius: 999px;
+        background: transparent; color: var(--dim); font-weight: 700; font-size: .95rem;
+        white-space: nowrap;
+      }
+      .tab-btn[aria-current="page"] { background: var(--accent); color: var(--accent-ink); }
+
+      /* ── Cards & buttons ── */
+      .card {
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: 1rem; padding: 1rem; margin-top: 1rem;
+      }
+      .card h2, .card h3 { margin: 0; }
+      .alt-box { background: var(--surface-alt); border-radius: .75rem; padding: .75rem; }
+      .dim { color: var(--dim); }
+      .small { font-size: .85rem; }
+      .tiny { font-size: .72rem; }
+      .btn-accent {
+        min-height: 2.75rem; padding: .4rem 1.25rem; border: 0; border-radius: 999px;
+        background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 1rem;
+      }
+      .btn-ghost {
+        min-height: 2.75rem; padding: .4rem 1rem; border: 1px solid var(--border); border-radius: 999px;
+        background: transparent; color: var(--text); font-weight: 700;
+      }
+      .btn-accent-outline {
+        min-height: 2.75rem; padding: .4rem 1rem; border: 1px solid var(--accent); border-radius: 999px;
+        background: transparent; color: var(--accent); font-weight: 700;
+      }
+      .btn-stop {
+        min-height: 2.75rem; padding: .4rem 1.25rem; border: 0; border-radius: 999px;
+        background: #e05d4d; color: #fff; font-weight: 700; font-size: 1rem;
+      }
+      .chip-btn {
+        min-height: 2.5rem; padding: .3rem .8rem; border: 1px solid var(--border); border-radius: .75rem;
+        background: var(--surface-alt); color: var(--text); font-weight: 600; font-size: .9rem;
+      }
+      .chip-btn.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+      .pill-btn {
+        min-height: 2.75rem; padding: .35rem 1rem; border: 1px solid var(--border); border-radius: 999px;
+        background: transparent; color: var(--text); font-weight: 700;
+      }
+      .pill-btn.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+      .row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+      .row-between { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; justify-content: space-between; }
+
+      /* ── Safari banner ── */
+      .safari-banner {
+        margin-top: 1rem; border: 2px solid var(--accent); border-radius: 1rem;
+        background: var(--surface); padding: 1rem;
+      }
+      .safari-banner h2 { font-size: 1.35rem; }
+      .safari-banner ol { margin: .5rem 0 0; padding-inline-start: 1.4rem; }
+      .safari-banner li { margin: .3rem 0; }
+      .btn-safari {
+        width: 100%; min-height: 3.25rem; margin-top: .75rem; border: 0; border-radius: 999px;
+        background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 1.15rem;
+      }
+
+      /* ── Coach ── */
+      .mic-status {
+        display: inline-flex; align-items: center; gap: .45rem;
+        border-radius: 999px; padding: .3rem .8rem; font-weight: 700; font-size: .9rem;
+        background: var(--idle-bg); color: var(--idle);
+      }
+      .mic-status.live { background: var(--good-bg); color: var(--good); }
+      .mic-status.err { background: var(--bad-bg); color: var(--bad); }
+      .mic-dot { width: .6rem; height: .6rem; border-radius: 50%; background: currentColor; flex: none; }
+      .mic-status.live .mic-dot { animation: pulse 1.1s ease-in-out infinite; }
+      @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+      @media (prefers-reduced-motion: reduce) { .mic-status.live .mic-dot { animation: none; } }
+      .meter {
+        direction: ltr; height: .7rem; border-radius: 999px; overflow: hidden;
+        background: var(--idle-bg);
+      }
+      .meter > div { height: 100%; border-radius: 999px; width: 0%; transition: width 80ms linear; }
+      .target-chip {
+        display: inline-flex; align-items: center; justify-content: center;
+        min-width: 2rem; height: 2rem; padding: 0 .4rem; border-radius: 999px;
+        font-size: .72rem; font-weight: 700; background: var(--idle-bg); color: var(--idle);
+      }
+      .target-chip.done { background: var(--good-bg); color: var(--good); }
+      .target-chip.now { background: var(--accent); color: var(--accent-ink); }
+      .verdict-box { border-radius: .75rem; padding: .8rem; text-align: center; }
+      .verdict-box .big { font-size: 1.2rem; font-weight: 700; }
+      .gauge { direction: ltr; position: relative; height: .8rem; border-radius: 999px; background: var(--idle-bg); }
+      .gauge .center { position: absolute; left: 50%; top: -4px; height: 1.3rem; width: 2px; background: var(--good); }
+      .gauge .ball {
+        position: absolute; top: 50%; width: 1rem; height: 1rem; border-radius: 50%;
+        border: 2px solid #fff; transform: translateY(-50%);
+      }
+      .alert-err { background: var(--bad-bg); color: #ffb4a6; border-radius: .75rem; padding: .75rem; font-size: .9rem; }
+      .alert-warn { background: var(--warn-bg); color: var(--warn); border-radius: .75rem; padding: .75rem; font-size: .9rem; }
+
+      /* ── Piano ── */
+      .piano { position: relative; direction: ltr; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+      .piano .whites { display: flex; }
+      .piano .wkey {
+        position: relative; flex: 1 1 0; height: 132px; padding: 0;
+        border: 1px solid #cbbfa5; border-radius: 0 0 .35rem .35rem;
+        background: linear-gradient(#fdf8ec, #efe6cf);
+      }
+      .piano .wkey.hl { background: #e8cf8f; }
+      .piano .wkey.act { background: var(--accent); }
+      .piano .bkey {
+        position: absolute; top: 0; z-index: 2; height: 84px; padding: 0;
+        transform: translateX(-50%); border: 0; border-radius: 0 0 .35rem .35rem;
+        background: linear-gradient(#3a2c1c, #171008); box-shadow: 0 3px 5px rgba(0,0,0,.4);
+      }
+      .piano .bkey.hl { background: #7a5c14; }
+      .piano .bkey.act { background: var(--accent); }
+      .piano .q-badge {
+        position: absolute; bottom: 1.6rem; left: 50%; transform: translateX(-50%);
+        font-size: .62rem; font-weight: 700; color: #8a6d1f; pointer-events: none;
+      }
+      .piano .c-label {
+        position: absolute; bottom: .35rem; left: 50%; transform: translateX(-50%);
+        font-size: .56rem; color: #8b7d63; pointer-events: none;
+      }
+      .piano .bkey .q-badge { bottom: .4rem; color: #e8cf8f; }
+
+      /* ── Plan ── */
+      .step-num {
+        flex: none; width: 2rem; height: 2rem; border-radius: 50%; margin-top: .15rem;
+        border: 1px solid var(--border); background: transparent; color: var(--dim);
+        font-weight: 700; display: inline-flex; align-items: center; justify-content: center; padding: 0;
+      }
+      .step-num.done { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+      .step-card.active { border-color: var(--accent); }
+      .tag-now {
+        border-radius: 999px; padding: .1rem .6rem; font-size: .72rem; font-weight: 700;
+        background: var(--accent); color: var(--accent-ink);
+      }
+      .tag-time {
+        border-radius: 999px; padding: .1rem .6rem; font-size: .72rem; font-weight: 600;
+        background: var(--surface-alt); color: var(--dim);
+      }
+      .day-dot {
+        width: 2.25rem; height: 2.25rem; border-radius: 50%; border: 1px solid var(--border);
+        display: inline-flex; align-items: center; justify-content: center; font-weight: 700;
+        background: var(--surface-alt); color: var(--dim);
+      }
+      .day-dot.done { background: var(--accent); color: var(--accent-ink); }
+      .day-dot.today { border-color: var(--accent); }
+      .timer-clock { direction: ltr; text-align: left; font-variant-numeric: tabular-nums; font-size: 2.3rem; font-weight: 700; line-height: 1.1; }
+      .progress { height: .65rem; border-radius: 999px; overflow: hidden; background: var(--surface-alt); }
+      .progress > div { height: 100%; background: var(--accent); border-radius: 999px; transition: width 1s linear; }
+      ul.plain { margin: .25rem 0 0; padding-inline-start: 1.2rem; }
+      ul.plain li { margin: .15rem 0; }
+      .divider-list { list-style: none; margin: .5rem 0 0; padding: 0; }
+      .divider-list li { display: flex; justify-content: space-between; gap: .5rem; padding: .5rem 0; border-top: 1px solid var(--border); }
+      .divider-list li:first-child { border-top: 0; }
+      h1.page { font-size: 1.9rem; margin: 1rem 0 0; }
+      .hidden { display: none !important; }
+
+      /* ── المحلل اللايف (Live Listen) ── */
+      .live-note { direction: ltr; font-size: 4.2rem; font-weight: 700; line-height: 1; letter-spacing: -.02em; }
+      .maqam-bar-row { display: grid; grid-template-columns: 5.2rem 1fr 2.6rem; gap: .5rem; align-items: center; padding: .35rem 0; }
+      .maqam-bar-track { height: .65rem; border-radius: 999px; background: var(--surface-alt); overflow: hidden; }
+      .maqam-bar-fill { height: 100%; border-radius: 999px; background: var(--dim); transition: width .35s ease; }
+      .maqam-bar-row.top .maqam-bar-fill { background: var(--accent); }
+      .maqam-bar-row.top .maqam-bar-name { color: var(--accent); font-weight: 700; }
+      .hist-chip {
+        direction: ltr; display: inline-flex; align-items: center; justify-content: center;
+        min-height: 2rem; padding: .15rem .55rem; border-radius: 999px;
+        background: var(--surface-alt); border: 1px solid var(--border); font-weight: 700; font-size: .85rem;
+      }
+      .hist-chip.qt { border-color: var(--accent); color: var(--accent); }
+
+      /* ── فيديوهات عبده داغر (مشغّل يوتيوب الرسمي) ── */
+      .yt-wrap { position: relative; width: 100%; padding-top: 56.25%; border-radius: .75rem; overflow: hidden; background: #000; margin-top: .55rem; }
+      .yt-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+      .dagher-video { border: 1px solid var(--border); border-radius: .75rem; padding: .75rem; margin-top: .6rem; background: var(--surface); }
+      .dagher-video h4 { margin: 0; font-size: 1rem; }
+      /* ── اسمع السلّم بصوت بشري حقيقي — مشغّل يوتيوب عند الطلب ── */
+      .human-scale-card { border: 1px solid var(--accent); border-radius: .75rem; padding: .75rem; margin-top: .8rem; background: var(--surface); }
+      .human-scale-card h3, .human-scale-card h4 { margin: 0; }
+      .yt-facade { display: flex; align-items: center; justify-content: center; background: var(--idle-bg); }
+      .yt-load-btn {
+        width: 100%; height: 100%; min-height: 9rem; border: 0; background: transparent; color: #f3ead3;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .45rem;
+        padding: 1rem; text-align: center; font-weight: 700; font-size: 1rem; line-height: 1.6;
+      }
+      .yt-load-btn .yt-play-ic { font-size: 2.2rem; color: var(--accent); line-height: 1; }
+      .yt-load-btn .yt-load-sub { font-size: .82rem; font-weight: 400; color: #b8a888; }
+      /* ── نفس المقام بصوت إبراهيم صبري — بلوك فيسبوك / TikTok جوه كارت السلّم البشري ── */
+      .sabry-block { border-top: 1px solid var(--border); margin-top: .85rem; padding-top: .75rem; }
+      .sabry-block h4 { font-size: 1.02rem; }
+      .ext-link { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+
+      /* ── مدرّس الغنا الصوتي — دروس بأسلوب مدرّبين اليوتيوب ── */
+      .sing-stage {
+        background: var(--idle-bg); color: #f3ead3; border-radius: 1rem;
+        padding: 1.1rem 1rem; text-align: center; margin-top: 1rem;
+      }
+      .sing-stage .sing-note { direction: ltr; font-size: 3.4rem; font-weight: 700; line-height: 1.15; min-height: 3.9rem; }
+      .sing-caption {
+        background: rgba(243,234,211,.1); border-radius: .75rem; padding: .65rem .8rem;
+        font-size: .95rem; line-height: 1.7; min-height: 3.2rem; margin-top: .6rem;
+      }
+      .sing-eq { display: flex; gap: .3rem; justify-content: center; align-items: flex-end; height: 1.6rem; margin-top: .7rem; }
+      .sing-eq span { width: .45rem; border-radius: 999px; background: var(--accent); height: 30%; }
+      .sing-eq.on span { animation: eqbounce .7s ease-in-out infinite alternate; }
+      .sing-eq.on span:nth-child(2) { animation-delay: .12s; }
+      .sing-eq.on span:nth-child(3) { animation-delay: .24s; }
+      .sing-eq.on span:nth-child(4) { animation-delay: .36s; }
+      .sing-eq.on span:nth-child(5) { animation-delay: .48s; }
+      @keyframes eqbounce { from { height: 18%; } to { height: 100%; } }
+      @media (prefers-reduced-motion: reduce) { .sing-eq.on span { animation: none; height: 60%; } }
+      .lesson-row {
+        display: flex; gap: .8rem; width: 100%; text-align: start; align-items: stretch;
+        background: var(--surface); border: 1px solid var(--border); border-radius: 1rem;
+        padding: .7rem; margin-top: .6rem; cursor: pointer; font-family: inherit; color: var(--text);
+      }
+      .lesson-row.on { border-color: var(--accent); border-width: 2px; }
+      .lesson-thumb {
+        flex: none; width: 6.4rem; border-radius: .65rem; background: var(--idle-bg); color: #f3ead3;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .15rem;
+        padding: .55rem .3rem; position: relative;
+      }
+      .lesson-thumb .lt-name { font-family: "Amiri", serif; font-size: 1.05rem; font-weight: 700; line-height: 1.25; text-align: center; }
+      .lesson-thumb .lt-play { font-size: 1.15rem; color: var(--accent); }
+      .lesson-thumb .lt-dur {
+        position: absolute; bottom: .3rem; inset-inline-start: .3rem;
+        background: rgba(0,0,0,.65); color: #fff; border-radius: .35rem;
+        font-size: .68rem; font-weight: 700; padding: .05rem .35rem; direction: ltr;
+      }
+      .lesson-meta { flex: 1; min-width: 0; }
+      .lesson-meta h3 { margin: 0; font-size: 1rem; line-height: 1.45; }
+      .lesson-meta p { margin: .25rem 0 0; }
+      .sing-step {
+        display: flex; gap: .6rem; align-items: flex-start; width: 100%; text-align: start;
+        border: 1px solid var(--border); border-radius: .75rem; background: var(--surface);
+        padding: .65rem .75rem; margin-top: .5rem; cursor: pointer; font-family: inherit; color: var(--text);
+      }
+      .sing-step.on { border-color: var(--accent); background: var(--surface-alt); }
+      .sing-step .ss-num {
+        flex: none; width: 1.7rem; height: 1.7rem; border-radius: 50%;
+        background: var(--surface-alt); border: 1px solid var(--border);
+        display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem;
+      }
+      .sing-step.on .ss-num { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+    </style>
+  </head>
+  <body>
+    <header class="tabbar">
+      <nav aria-label="أقسام التطبيق" id="tabbar"></nav>
+    </header>
+
+    <main class="wrap">
+      <!-- ══════════ المدرب اللايف ══════════ -->
+      <section id="panel-coach" aria-label="المدرب اللايف">
+        <div class="safari-banner" id="safari-banner">
+          <h2 class="font-display">🎤 المدرب اللايف بيشتغل من Safari</h2>
+          <p style="margin:.4rem 0 0">
+            المدرب ده بيسمعك <strong>لايف</strong> وانت بتعزف أو بتغني وبيصححك لحظة بلحظة — زي تطبيقات الـ App Store بالظبط.
+            المايك الحي بيشتغل لما الصفحة دي تتفتح في <strong>متصفح Safari نفسه</strong>؛ المتصفح اللي جوه التطبيقات بيحجب المايك الحي ومش هيطلع طلب إذن أصلًا.
+          </p>
+          <button type="button" class="btn-safari" id="btn-open-safari" aria-label="افتح هذه النسخة في Safari">🔗 افتح هذه النسخة في Safari</button>
+          <div id="safari-steps">
+            <p style="margin:.8rem 0 0"><strong>إزاي تفتحها في Safari وتثبّتها كأنها App؟</strong></p>
+            <ol>
+              <li>افتح رابط الصفحة دي في <strong>Safari</strong> (انسخ الرابط من المتصفح الحالي والصقه في Safari، أو افتح الرابط اللي اتبعتلك من Safari مباشرة).</li>
+              <li>في Safari دوس زرار <strong>المشاركة ⬆️</strong> اللي تحت.</li>
+              <li>اختار <strong>Add to Home Screen — إضافة إلى الشاشة الرئيسية</strong>.</li>
+              <li>هتلاقي أيقونة «مدرب المقامات لايف» على شاشتك — بتفتح ملء الشاشة زي أي تطبيق من الـ App Store، والمايك اللايف شغال جواها.</li>
+              <li>أول مرة تدوس «ابدأ الاستماع» هيظهرلك طلب إذن المايك — دوس <strong>سماح (Allow)</strong>.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="card" id="coach-card">
+          <div class="row-between">
+            <h3 style="font-size:1.15rem" id="coach-title">المدرب المباشر بالمايك</h3>
+            <span class="mic-status" id="mic-status" role="status"><span class="mic-dot"></span><span id="mic-status-text">المايك واقف</span></span>
+          </div>
+          <p class="small dim" style="margin:.35rem 0 0">
+            غنّي بصوتك أو اعزف على بيانو حقيقي قدام المايك، والمدرب هيقارن اللي بتعمله بالنغمة المطلوبة لحظة بلحظة — بدقة الربع تون. التحليل بيتم على جهازك وصوتك مش بيتبعت لأي مكان.
+          </p>
+
+          <div class="row" style="margin-top:.8rem">
+            <button type="button" class="btn-accent" id="btn-mic" aria-label="بدء الاستماع بالمايك">🎤 ابدأ الاستماع</button>
+            <button type="button" class="btn-ghost" id="btn-test-tone" aria-label="جرّب بصوت تجريبي">🔊 جرّب بصوت تجريبي</button>
+          </div>
+          <p class="tiny dim" style="margin:.4rem 0 0">
+            «جرّب بصوت تجريبي» بيشغّل النغمة المطلوبة من سماعة الموبايل والمايك بيسمعها — لو المدرب لقطها وعدّاها صح، يبقى اللايف شغال تمام من غير ما تعزف.
+          </p>
+
+          <p class="alert-err hidden" id="mic-error" role="alert" style="margin-top:.75rem"></p>
+
+          <div id="live-ui" class="hidden" style="margin-top:.9rem">
+            <div class="meter" aria-label="مؤشر مستوى صوت المايك"><div id="level-fill"></div></div>
+            <p class="tiny dim" id="level-text" style="margin:.3rem 0 0">المايك مفتوح بس مش سامع صوت لسه — اعزف نغمة وشوف المؤشر بيتحرك ولا لأ</p>
+            <p class="tiny hidden" id="nosound-note" style="margin:.3rem 0 0;color:var(--warn)"></p>
+          </div>
+
+          <div id="targets-ui" style="margin-top:1rem">
+            <div class="row" id="target-chips" style="gap:.4rem" aria-label="تقدم التمرين"></div>
+            <p class="tiny dim" id="score-line" style="margin:.4rem 0 0"></p>
+          </div>
+
+          <div id="finished-box" class="hidden" style="margin-top:1rem;background:var(--good-bg);border-radius:.75rem;padding:1rem;text-align:center">
+            <p style="margin:0;font-size:1.25rem;font-weight:700;color:var(--good)">🎉 خلّصت التمرين كله صح!</p>
+            <p class="small" id="finished-detail" style="margin:.3rem 0 0;color:#bfe9d2"></p>
+            <button type="button" class="btn-accent" id="btn-restart-done" aria-label="إعادة التمرين من الأول" style="margin-top:.7rem;background:var(--good);color:#12291d">العب من الأول</button>
+          </div>
+
+          <div id="live-box">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:1rem">
+              <div class="alt-box" style="text-align:center">
+                <p class="tiny dim" style="margin:0">المطلوب</p>
+                <p id="target-name" style="margin:.2rem 0 0;font-size:1.3rem;font-weight:700">أي نغمة</p>
+                <button type="button" class="chip-btn" id="btn-hear-target" aria-label="اسمع النغمة المطلوبة" style="margin-top:.45rem">🔊 اسمعها</button>
+              </div>
+              <div class="alt-box" style="text-align:center">
+                <p class="tiny dim" style="margin:0">اللي انت جبته</p>
+                <p id="detected-name" style="margin:.2rem 0 0;font-size:1.3rem;font-weight:700">—</p>
+                <p class="tiny dim" id="detected-freq" style="margin:0">مفيش صوت</p>
+              </div>
+            </div>
+
+            <div class="verdict-box" id="verdict-box" style="margin-top:.75rem;background:var(--idle-bg)">
+              <p class="big" id="verdict-label" style="margin:0;color:var(--idle)">المايك واقف</p>
+              <p class="small" id="verdict-detail" style="margin:.25rem 0 0"></p>
+            </div>
+
+            <div id="gauge-ui" style="margin-top:.75rem">
+              <div class="gauge" aria-label="مقياس الانحراف بالسنت">
+                <div class="center"></div>
+                <div class="ball" id="gauge-ball" style="left:calc(50% - 8px);background:#ffd166"></div>
+              </div>
+              <div class="row-between tiny dim" style="margin-top:.25rem">
+                <span>خافت −50</span><span id="cents-label">٠ سنت</span><span>حاد +50</span>
+              </div>
+            </div>
+
+            <div class="row" id="seq-controls" style="margin-top:.75rem">
+              <button type="button" class="btn-ghost" id="btn-skip" aria-label="تخطي النغمة الحالية" style="flex:1">تخطّي النغمة</button>
+              <button type="button" class="btn-ghost" id="btn-restart" aria-label="إعادة التمرين" style="flex:1">من الأول</button>
+            </div>
+            <p class="tiny dim" id="target-freq-line" style="text-align:center;margin:.5rem 0 0"></p>
+          </div>
+
+          <div class="alt-box" style="margin-top:1.1rem;border:1px solid var(--accent)">
+            <p style="margin:0;font-weight:700">🔍 جديد — المحلل اللايف (زي Live Listen في التطبيقات المجانية)</p>
+            <p class="small dim" style="margin:.3rem 0 0">مش عايز تمرين بنغمة مطلوبة؟ شغّل المحلل واعزف براحتك: هيقولك كل نغمة اسمها إيه وبكام سنت، وهيخمّن انت في أنهي مقام من عزفك نفسه.</p>
+            <button type="button" class="btn-accent" id="btn-goto-analyzer" aria-label="افتح المحلل اللايف" style="margin-top:.6rem">🔍 افتح المحلل اللايف</button>
+          </div>
+
+          <div class="alt-box" style="margin-top:1.1rem">
+            <p style="margin:0;font-weight:700">اختر تمرين المايك</p>
+            <p class="tiny dim" style="margin:.2rem 0 .6rem">اختار مقام واتدرب على سلّمه صعودًا ونزولًا، أو جملة صولو، أو تدريب حر على أي مقام — وبعدين دوس «ابدأ الاستماع».</p>
+            <div class="row" id="exercise-picker"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ مدرّس الغنا الصوتي — زي مدرّبين اليوتيوب ══════════ -->
+      <section id="panel-sing" class="hidden" aria-label="مدرس الغنا الصوتي">
+        <h1 class="page font-display">مدرّس الغنا — دروس بصوت المدرب</h1>
+        <p class="dim" style="margin:.3rem 0 0">
+          زي ما مدرّبين الغنا الشرقي والمقامات على يوتيوب بيعلّموا بالظبط: تسمع المدرّب الحقيقي بيغنّي السلّم بصوته البشري الأول،
+          وانت <strong>تردّد وراه بصوتك</strong>، وبعدين الخطوات التفاعلية تحت بتسمعك <strong>وتصحّحك</strong> نغمة نغمة بالمايك.
+          وصوت البيانو مكانه تبويب «البيانو والكوردات» ودروس البيانو — هنا في دروس الغنا المرجع الأول هو الصوت البشري.
+        </p>
+
+        <div class="card" style="border:1px solid var(--accent)">
+          <h2 class="font-display" style="font-size:1.3rem">🎤 اسمع السلّم بصوت بشري حقيقي — وقول وراه</h2>
+          <p class="small" style="margin:.35rem 0 0">الفيديو اللي تحت بيتغيّر مع الدرس اللي اخترته: ده مدرّب حقيقي بيغنّي سلّم مقام الدرس كامل بصوته — اسمعه للآخر وقول وراه بصوتك قبل ما تنزل للخطوات التفاعلية.</p>
+          <div id="sing-human-video"></div>
+          <p class="small" style="margin:.7rem 0 0;background:var(--surface-alt);border-radius:.75rem;padding:.65rem .8rem"><strong>بصراحة — الفرق بين الصوتين:</strong> خطوات التطبيق اللي تحت صوتها <strong>صوت مُصنّع (سينث)</strong> بيتولّد على جهازك، ووظيفته التدريب التفاعلي والتصحيح بالمايك نغمة نغمة بدقة الربع تون — مش صوت مغنّي حقيقي. أما الفيديوهات دي فهي <strong>المرجع البشري الحقيقي</strong> لكل سلّم: صوت مدرّب فعلي تسمعه وتقلّده. الفيديو بيشتغل عند الطلب من مشغّل يوتيوب الرسمي (youtube-nocookie) — دوس تشغيل عشان يفتح.</p>
+        </div>
+
+        <div class="card">
+          <h2 class="font-display" style="font-size:1.3rem">🎤 إزاي بيشتغل الدرس؟</h2>
+          <ol class="small" style="margin:.5rem 0 0;padding-inline-start:1.3rem;line-height:2">
+            <li><strong>اسمع:</strong> المدرب بيغنّي الخطوة بصوته، واسم كل نغمة بيظهر كبير قدامك وهي بتتغنّى، وكلامه بيظهر تحت كتعليق زي ترجمة فيديوهات اليوتيوب.</li>
+            <li><strong>ردّد:</strong> بعد ما يخلّص، دوس «دوري — أغنّي وراه» والمايك هيفتح؛ غنّي نفس النغمات بصوتك على «آه».</li>
+            <li><strong>اتصحّح:</strong> المدرب اللايف بيقارن صوتك بالمطلوب وبيقولك صح ولا حاد ولا خافت وبكام سنت، وبيعدّي بيك نغمة نغمة لحد القفلة.</li>
+          </ol>
+          <p class="small dim" style="margin:.5rem 0 0">الطريقة دي — جنس جنس، جملة جملة، سماع وترديد — هي نفس طريقة أساتذة المقام على يوتيوب زي دروس «اسمع وغنّي بعدي». وكل درس متقسّم خطوات قصيرة تقدر تعيد أي خطوة لوحدها.</p>
+          <div id="sing-stage-mount"></div>
+          <div id="sing-steps"></div>
+        </div>
+
+        <div class="card">
+          <h2 class="font-display" style="font-size:1.3rem">📺 دروس الغنا والمقامات — اختار درسك</h2>
+          <p class="small dim" style="margin:.3rem 0 0">قايمة دروس زي قايمة تشغيل قناة تعليم غنا: تسخين ونَفَس، وبعدين درس كامل لكل مقام من التسعة، ودرس أخير للعُرب والقفلة. ابدأ من فوق وامشِ بالترتيب لو لسه في الأول.</p>
+          <div id="sing-playlist"></div>
+        </div>
+      </section>
+
+      <!-- ══════════ المحلل اللايف — Live Listen ══════════ -->
+      <section id="panel-analyzer" class="hidden" aria-label="المحلل اللايف للمقام">
+        <h1 class="page font-display">المحلل اللايف — اسمع واعرف المقام</h1>
+        <p class="dim" style="margin:.3rem 0 0">
+          دي نفس فكرة خاصية <strong>Live Listen</strong> اللي في التطبيقات المجانية زي Maqam Analyzer: مفيش تمرين ومفيش نغمة مطلوبة.
+          انت اعزف أو غنّي براحتك، وهو بيسمعك لايف وبيقولك كل نغمة اسمها إيه وبكام سنت، وبيجمع النغمات وبيخمّن انت في أنهي مقام.
+        </p>
+
+        <div class="card">
+          <div class="row-between">
+            <h2 style="font-size:1.15rem">🎧 Live Listen — بيحلّل وانت بتعزف</h2>
+            <span class="mic-status" id="an-status" role="status"><span class="mic-dot"></span><span id="an-status-text">المحلل واقف</span></span>
+          </div>
+          <p class="small dim" style="margin:.4rem 0 0">
+            شغّله وسيبه مفتوح وانت بتعزف على بيانوك الحقيقي أو بتغنّي. كل ما تثبّت على نغمة هتتسجل تحت، وكل ما تجمع نغمات أكتر تخمين المقام هيبقى أدق.
+            التحليل بيتم على جهازك وصوتك مش بيتبعت لأي مكان.
+          </p>
+          <div class="row" style="margin-top:.8rem">
+            <button type="button" class="btn-accent" id="btn-analyzer" aria-label="بدء التحليل اللايف">🎤 ابدأ التحليل اللايف</button>
+            <button type="button" class="btn-ghost" id="btn-analyzer-clear" aria-label="مسح تحليل النغمات">🗑 امسح وابدأ من جديد</button>
+          </div>
+          <p class="alert-err hidden" id="an-error" role="alert" style="margin-top:.75rem"></p>
+
+          <div id="an-live" class="hidden" style="margin-top:1rem">
+            <div class="meter" aria-label="مستوى صوت المايك في المحلل"><div id="an-level-fill"></div></div>
+            <p class="tiny dim" id="an-level-text" style="margin:.3rem 0 0">المايك مفتوح — اعزف نغمة وثبّت عليها ثانية</p>
+          </div>
+
+          <div style="text-align:center;margin-top:1.1rem">
+            <p class="tiny dim" style="margin:0">النغمة اللي سامعها دلوقتي</p>
+            <p class="live-note" id="an-note" style="margin:.25rem 0 0">—</p>
+            <p class="small dim" id="an-freq" style="margin:.2rem 0 0">مفيش صوت لسه</p>
+            <p class="small" id="an-cents-line" style="margin:.15rem 0 0;font-weight:700"></p>
+          </div>
+
+          <div style="margin-top:.9rem">
+            <div class="gauge" aria-label="مقياس انحراف النغمة بالسنت في المحلل">
+              <div class="center"></div>
+              <div class="ball" id="an-gauge-ball" style="left:calc(50% - 8px);background:#ffd166"></div>
+            </div>
+            <div class="row-between tiny dim" style="margin-top:.25rem"><span>خافت −50 سنت</span><span id="an-cents-label">٠ سنت</span><span>حاد +50 سنت</span></div>
+            <p class="tiny dim" style="text-align:center;margin:.45rem 0 0">
+              <strong>السنت</strong> هو وحدة قياس الفرق الصغيّر بين نغمتك والنغمة الصح: نص التون = ١٠٠ سنت، والربع تون = ٥٠ سنت.
+              لو الفرق أقل من ٢٥ سنت انت مظبوط عمليًا. النغمات اللي فيها ¼ دي ربع تون — روح المقامات الشرقية.
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="font-display" style="font-size:1.3rem">🎼 انت غالبًا في أنهي مقام؟</h2>
+          <div id="an-guess" style="margin-top:.6rem">
+            <p class="small dim" style="margin:0">لسه مفيش نغمات كفاية — شغّل التحليل واعزف ٤ أو ٥ نغمات من نفس المقام (طالع نازل على مهلك) وهيبان التخمين هنا على طول.</p>
+          </div>
+          <div id="an-bars" style="margin-top:.6rem"></div>
+          <p class="tiny dim" style="margin:.6rem 0 0">
+            التخمين بيتحسب من حاجتين: كام نغمة من اللي عزفتها تنتمي لسلّم كل مقام، وكام نغمة من سلّم المقام نفسه انت عزفتها فعلًا.
+            كل ما تعزف نغمات أكتر من نفس المقام، النسبة هتثبت والمقام الصح هيطلع فوق.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="row-between">
+            <h2 class="font-display" style="font-size:1.3rem">📝 النغمات اللي سمعها منك</h2>
+            <span class="small dim" id="an-count"></span>
+          </div>
+          <p class="small dim" style="margin:.3rem 0 0">آخر نغمات ثبّتّ عليها بالترتيب. النغمات المدهّبة دي ربع تون. لو لقيت نغمة غريبة وسطهم، دي غالبًا نغمة عابرة أو دقة مش مظبوطة — امسح وجرّب تاني على مهلك.</p>
+          <div class="row" id="an-history" style="margin-top:.6rem;gap:.4rem">
+            <span class="small dim">مفيش نغمات متسجلة لسه</span>
+          </div>
+          <div class="alt-box" style="margin-top:.9rem">
+            <p style="margin:0;font-weight:700">جرّبها كده أول مرة 👇</p>
+            <ol class="small" style="margin:.4rem 0 0;padding-inline-start:1.3rem;line-height:1.9">
+              <li>دوس «ابدأ التحليل اللايف» وادّي إذن المايك في Safari.</li>
+              <li>على بيانوك، اعزف سلّم الراست على مهلك: <span dir="ltr"><strong>C – D – E half-flat – F – G – A – B half-flat – C</strong></span> (قرّب الربع تون بأقرب مفتاح لو بيانوك عادي، أو غنّيها بصوتك بدقة).</li>
+              <li>بص على تخمين المقام — المفروض «الراست» يطلع فوق بنسبة عالية.</li>
+              <li>امسح، وجرّب سلّم تاني (حجاز مثلًا) وشوف التخمين بيتبدّل معاك لايف.</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ المقامات ══════════ -->
+      <section id="panel-maqamat" class="hidden" aria-label="المقامات الشرقية">
+        <h1 class="page font-display">المقامات الشرقية</h1>
+        <p class="dim" style="margin:.3rem 0 0">
+          اختار مقام، اسمع سلّمه (بالربع تون زي ما هو)، واتعرّف على أجناسه وطابعه وأشهر أغانيه — وبعدين اتدرّب عليه بصوتك أو بعزفك قدام المايك اللايف.
+        </p>
+        <div class="row" id="maqam-picker" style="margin-top:1rem" role="group" aria-label="اختيار المقام"></div>
+        <div id="maqam-detail"></div>
+        <div class="card" id="ear-quiz"></div>
+        <div class="card" id="dagher-ear"></div>
+      </section>
+
+      <!-- ══════════ البيانو والكوردات ══════════ -->
+      <section id="panel-piano" class="hidden" aria-label="البيانو والكوردات">
+        <h1 class="page font-display">البيانو: كوردات وصولو</h1>
+        <p class="dim" style="margin:.3rem 0 0">البيانو تحت صوابعك — دوس على المفاتيح واعزف. ابنِ أي كورد، جرّب التسلسلات المشهورة في الأغاني العربية، واتدرّب على جُمَل الصولو.</p>
+        <div class="card" style="padding:.8rem">
+          <div id="main-piano"></div>
+          <p class="small dim" style="margin:.6rem 0 0">
+            دوست على مفتاح أو زرار تشغيل ومفيش صوت؟ علّي صوت الجهاز نفسه (أزرار الصوت اللي على الجنب) واتأكد إن الصوت مش رايح لسماعة بلوتوث بعيدة — صوت البيانو بيطلع من سماعة الموبايل على طول ومش بيتأثر بزرار الصامت.
+          </p>
+        </div>
+        <div id="chord-builder"></div>
+        <div id="progressions"></div>
+        <div id="solo-section"></div>
+      </section>
+
+      <!-- ══════════ خطة اليوم ══════════ -->
+      <section id="panel-plan" class="hidden" aria-label="خطة تدريب اليوم">
+        <h1 class="page font-display">خطة تدريب اليوم — ١٥ دقيقة</h1>
+        <p class="dim" style="margin:.3rem 0 0">
+          ربع ساعة كل يوم أحسن من ساعتين مرة في الأسبوع. الخطة بتتغيّر كل يوم: مقام جديد، جملة صولو، تسلسل كوردات، وأغنية — وكل خطوة مربوطة بالبيانو والمايك اللايف.
+        </p>
+        <div id="plan-content"></div>
+      </section>
+    </main>
+
+    <script>
+    "use strict";
+    /* ════════════════ البيانات الموسيقية ════════════════ */
+    var MAQAMAT = [
+      { id:"rast", name:"الراست", tonicName:"C", tonicMidi:60,
+        notes:[["C",0],["D",2],["E half-flat",3.5],["F",5],["G",7],["A",9],["B half-flat",10.5],["C",12]],
+        jins:["جنس راست على C","جنس راست على G"],
+        mood:"الفخر والاعتزاز والفرح الوقور",
+        character:"ملك المقامات وأبوها؛ أصلٌ تُقاس عليه بقية المقامات. علامته المميزة: الـE half-flat والـB half-flat.",
+        famous:["لسه فاكر — أم كلثوم","أمل حياتي — أم كلثوم","يا مسهرني — أم كلثوم"],
+        sayr:"يبدأ غالبًا من الجواب (C العالية) وينزل تدريجيًا للقرار، ويقف على G قبل القفلة على C.",
+        phrases:[
+          { title:"قفلة راست كلاسيكية", notes:[12,10.5,9,7,9,7,5,3.5,2,0], tip:"انزل براحة وخلّي الـE half-flat تتسمع بوضوح قبل القفلة." },
+          { title:"صعود من القرار", notes:[0,2,3.5,5,7,9,7,5,3.5,2,0], tip:"اتدرّب عليها بطيء الأول، واربط النغمات (ليجاتو) من غير ما تقطع النفس." }
+        ]},
+      { id:"bayati", name:"البياتي", tonicName:"D", tonicMidi:62,
+        notes:[["D",0],["E half-flat",1.5],["F",3],["G",5],["A",7],["B♭",8],["C",10],["D",12]],
+        jins:["جنس بياتي على D","جنس نهاوند على G"],
+        mood:"الشجن والخشوع والدفء",
+        character:"مقام المواويل والأدعية والغناء الشعبي؛ الـE half-flat القريبة من الـD هي روحه وحنينه.",
+        famous:["حيرت قلبي معاك — أم كلثوم","على حسب وداد قلبي — عبد الحليم حافظ","مواويل محمد عبد الوهاب"],
+        sayr:"يدور حول الـD والـE half-flat في المنطقة الوسطى، ويطلع للـG والـA قبل ما يقفل على الـD.",
+        phrases:[
+          { title:"موال بياتي قصير", notes:[0,1.5,3,1.5,0,3,5,3,1.5,0], tip:"قرّب الـE half-flat من الـD ودلّعها باهتزاز خفيف (فيبراتو)." },
+          { title:"طلعة للجواب", notes:[0,1.5,3,5,7,5,3,1.5,0], tip:"الـA هنا محطة استراحة؛ ارجع منها بهدوء للـD." }
+        ]},
+      { id:"hijaz", name:"الحجاز", tonicName:"D", tonicMidi:62,
+        notes:[["D",0],["E♭",1],["F♯",4],["G",5],["A",7],["B♭",8],["C",10],["D",12]],
+        jins:["جنس حجاز على D","جنس حجاز على G"],
+        mood:"الشوق والحنين والشجن المشرق",
+        character:"علامته لا تُخطئ: البعد الواسع (ثانية زائدة) بين الـE♭ والـF♯ — هو «قفزة» الحجاز الشهيرة.",
+        famous:["قدك المياس — صباح فخري","فوق النخل — ناظم الغزالي","يا طيور الطايرة — فيروز"],
+        sayr:"يُفتتح غالبًا من منطقة الجنس الأول ويُبرز قفزة الحجاز، ويقفل بجنس حجاز ثانٍ على الـG.",
+        phrases:[
+          { title:"قفزة الحجاز", notes:[0,1,4,5,4,1,0], tip:"وسّع المسافة بين الـE♭ والـF♯ وخلّي القفزة تتسمع كأنها تنهيدة." },
+          { title:"لازمة حجازية", notes:[7,8,7,5,4,5,4,1,0], tip:"العبها بإيقاع منتظم وجرّب تزين الـF♯ بتريل سريع." }
+        ]},
+      { id:"nahawand", name:"النهاوند", tonicName:"C", tonicMidi:60,
+        notes:[["C",0],["D",2],["E♭",3],["F",5],["G",7],["A♭",8],["B♭",10],["C",12]],
+        jins:["جنس نهاوند على C","جنس حجاز على G"],
+        mood:"الرومانسية والحنان والحزن الرقيق",
+        character:"أقرب المقامات للسلم الصغير الغربي، فهو أسهل مدخل للبيانو؛ وفي الصعود تُستبدل الـB♭ أحيانًا بـB طبيعية (نهاوند مرصّع).",
+        famous:["أنا في انتظارك — أم كلثوم","إنت الحب — أم كلثوم","حبيبتي — وردة"],
+        sayr:"حركة لحنية ناعمة تشبه السلم الصغير؛ يقف على الـG بجنس حجاز يعطيه اللون الشرقي.",
+        phrases:[
+          { title:"جملة رومانسية", notes:[0,2,3,5,7,5,3,2,0], tip:"نعّم العزف (ليجاتو) وخلّي الـE♭ ملوّنة وحزينة." },
+          { title:"نهاوند مرصّع صاعد", notes:[0,2,3,5,7,8,11,12], tip:"لاحظ الـB الطبيعية في الصعود — هي لمسة النهاوند المرصّع." }
+        ]},
+      { id:"kurd", name:"الكرد", tonicName:"D", tonicMidi:62,
+        notes:[["D",0],["E♭",1],["F",3],["G",5],["A",7],["B♭",8],["C",10],["D",12]],
+        jins:["جنس كرد على D","جنس نهاوند على G"],
+        mood:"الحزن الهادئ والتأمل",
+        character:"أبسط المقامات بناءً (لا ربع تون فيه) وأقربها للأذن الحديثة؛ عماد أغاني عاطفية كثيرة منذ الستينيات.",
+        famous:["أنت عمري — أم كلثوم","جانا الهوى — عبد الحليم حافظ","زي الهوى — عبد الحليم حافظ"],
+        sayr:"يتحرك بحرية حول الـD والـF، ويقف على الـG بجنس النهاوند قبل القفلة.",
+        phrases:[
+          { title:"جملة كرد حزينة", notes:[7,5,3,1,0,1,3,0], tip:"خليك قريب من الـD؛ الكرد قوته في بساطته وقربه من القلب." },
+          { title:"نزول متدرج", notes:[12,10,8,7,5,3,1,0], tip:"اتدرب عليها مع كوردات Am – G – F – E في اليد الشمال." }
+        ]},
+      { id:"saba", name:"الصبا", tonicName:"D", tonicMidi:62,
+        notes:[["D",0],["E half-flat",1.5],["F",3],["G♭",4],["A",7],["B♭",8],["C",10],["D",12]],
+        jins:["جنس صبا على D","جنس حجاز على G♭"],
+        mood:"الحزن العميق والبكاء الموسيقي",
+        character:"أحزن المقامات؛ علامته الـG♭ المنخفضة الملتصقة بالـF — مسافة ضيقة تخطف القلب.",
+        famous:["الأطلال — أم كلثوم (مقاطع منها)","مواويل الصبا عند صباح فخري","ليه يا بنفسج — صالح عبد الحي"],
+        sayr:"يدور طويلًا في الجنس الأول الضيق (D–F–G♭) ولا يرتاح إلا قليلًا قبل قفلة حزينة على الـD.",
+        phrases:[
+          { title:"بكائية الصبا", notes:[0,1.5,3,4,3,1.5,0], tip:"الصق الـG♭ بالـF وخلّي النزول بطيء وموجوع." },
+          { title:"وقفة على G♭", notes:[3,4,7,4,3,1.5,3,0], tip:"الـA هنا لحظة نور قصيرة وسط الحزن؛ لا تطوّلها." }
+        ]},
+      { id:"sikah", name:"السيكاه", tonicName:"E half-flat", tonicMidi:63.5,
+        notes:[["E half-flat",0],["F",1.5],["G",3.5],["A",5.5],["B half-flat",7],["C",8.5],["D",10.5],["E half-flat",12]],
+        jins:["جنس سيكاه على E half-flat","جنس راست على B half-flat"],
+        mood:"الطرب الأصيل والنشوة",
+        character:"مقام القدود والموشحات؛ ركوزه نفسه ربع تون (E half-flat) فلا يُعزف كما هو على بيانو عادي إلا بتقريب أو بيانو معدّل.",
+        famous:["يا مسافر وحدك — محمد عبد الوهاب (عائلة الهزام)","القدود الحلبية","موشح يا شادي الألحان"],
+        sayr:"يبدأ من الركوز الربع-توني ويتصاعد برشاقة، ويُختم غالبًا بقفلة هزامية مبهجة.",
+        phrases:[
+          { title:"افتتاحية سيكاه", notes:[0,1.5,3.5,5.5,3.5,1.5,0], tip:"ثبّت أذنك على الركوز الربع-توني بالمايك قبل ما تبدأ." },
+          { title:"قفلة هزامية", notes:[7,8.5,10.5,12,10.5,8.5,7,5.5,3.5,1.5,0], tip:"اختم بخفة وسرعة — القفلة الهزامية مبهجة بطبعها." }
+        ]},
+      { id:"ajam", name:"العجم", tonicName:"B♭", tonicMidi:58,
+        notes:[["B♭",0],["C",2],["D",4],["E♭",5],["F",7],["G",9],["A",11],["B♭",12]],
+        jins:["جنس عجم على B♭","جنس عجم على F"],
+        mood:"البهجة والفخامة والإشراق",
+        character:"هو السلم الكبير (الميجور) بروح عربية؛ مقام الأناشيد والاحتفالات والافتتاحيات المهيبة.",
+        famous:["نسم علينا الهوى — فيروز","طلعت يا محلا نورها — سيد درويش","أهو ده اللي صار — سيد درويش"],
+        sayr:"صعود واثق ومباشر كالسلم الكبير، بقفلات واضحة على الركوز.",
+        phrases:[
+          { title:"افتتاحية مهيبة", notes:[0,4,7,12,11,9,7,4,0], tip:"اعزف بثقة وصوت ممتلئ — العجم مقام مناسبات كبيرة." },
+          { title:"سلم كامل", notes:[0,2,4,5,7,9,11,12,11,9,7,5,4,2,0], tip:"ده نفسه سلم الميجور؛ اربطه بكوردات B♭ – E♭ – F." }
+        ]},
+      { id:"hijazkar", name:"الحجاز كار", tonicName:"C", tonicMidi:60,
+        notes:[["C",0],["D♭",1],["E",4],["F",5],["G",7],["A♭",8],["B",11],["C",12]],
+        jins:["جنس حجاز على C","جنس حجاز على G"],
+        mood:"العظمة والشموخ والطرب الثقيل",
+        character:"حجاز مضاعف: جنسا حجاز متعاكسان (على C وعلى G) يعطيانه فخامة نادرة؛ مقام أغاني الطرب الطويلة.",
+        famous:["يا حبيبي تعال الحقني — أسمهان","من غير ليه — محمد عبد الوهاب","هذه ليلتي — أم كلثوم"],
+        sayr:"يستعرض الجنسين الحجازيين بالتناوب، ويقفل بقفزة حجازية مهيبة على C.",
+        phrases:[
+          { title:"حجاز مزدوج", notes:[0,1,4,5,7,8,11,12], tip:"اسمع القفزتين: من الـD♭ للـE، ومن الـA♭ للـB." },
+          { title:"قفلة شامخة", notes:[12,11,8,7,5,4,1,0], tip:"انزل ببطء ووقار واختم بـC ثابتة وواضحة." }
+        ]}
+    ];
+
+    /* ════════════════ تقاسيم عبده داغر — فيديوهات يوتيوب موثّقة فقط ════════════════
+       عبده داغر عازف كمان (ملك التقاسيم)، مش مغنّي: الفيديوهات دي لتدريب الأذن
+       على شخصية المقام وسيره وأجناسه وقفلته، وبتشتغل من مشغّل يوتيوب الرسمي. */
+    var DAGHER_BY_MAQAM = {
+      nahawand: [
+        { id: "dHC2NUIvth0", title: "لونجا نهاوند — من ألبوم L'Egyptien (رفع رسمي من الشركة)",
+          listen: "اسمع التنقّل بين جنس النهاوند على C وجنس الحجاز على G، وازاي كل جولة بترجع تقفل على الركوز C." },
+        { id: "u4tgUf4R0Uw", title: "تقاسيم نهاوند — عبده داغر مع جوزيف طاودروس (القاهرة ٢٠٠٤)",
+          listen: "تابِع السير: بداية هادية من القرار، طلوع تدريجي للغماز G ووقفة عليه، وبعدين نزول وقفلة واضحة على C." },
+        { id: "hd3HYUqg3BI", title: "تقاسيم ولونجا نهاوند",
+          listen: "قارن التقسيم الحر في الأول بإيقاع اللونجا السريع بعدها — نفس الأجناس ونفس القفلة على الركوز، بس طاقة مختلفة." },
+        { id: "8IyscwUIEDQ", title: "سماعي نهاوند",
+          listen: "اسمع الخانات والتسليم: كل خانة بتستعرض جنس وتلفّ، والتسليم بيرجّعك كل مرة للركوز C زي نقطة في آخر الجملة." }
+      ],
+      kurd: [
+        { id: "VWg7e12TzbA", title: "تقسيمة كمان — مقام كرد (١٩٩٨)",
+          listen: "الكرد مفيهوش ربع تون، فركّز على الدوران حوالين D وF، والوقوف على G بجنس النهاوند قبل القفلة الأخيرة على الركوز D." }
+      ]
+    };
+    var DAGHER_GENERAL = [
+      { id: "HIF3M2SwxBM", title: "تقاسيم كمان — عبده داغر",
+        listen: "تدريب أذن حر: من أول جنس تسمعه حاول تخمّن المقام، ولاحظ اللحن بيرجع يقفل على ركوزه في الآخر ازاي." },
+      { id: "zKVSL72nd7Q", title: "ليالي زمان — من ألبوم L'Egyptien",
+        listen: "الليالي سير لحني طويل: صعود بالتدريج، وقفات على الغماز تشدّ ودنك، وقفلات متكررة على الركوز قبل ما يكمل." }
+    ];
+    var DAGHER_VOCAL = { id: "vP8jF0ZAL-o", title: "يا سيد الكونين — الشيخ محمد عمران يغنّي وعبده داغر يردّ عليه بالكمان",
+      listen: "ده موّال وابتهال ديني، مش درس سلّم: اسمع عمران بيبني الجملة بصوته وداغر بيجاوبه بالكمان في نفس الجنس، والاتنين بيقابلوا بعض على القفلة." };
+
+    /* ════════════════ سلالم بصوت بشري حقيقي — فيديوهات مدرّبين موثّقة ════════════════
+       كل فيديو مدرّب فعلي بيغنّي السلّم بصوته. المشغّل youtube-nocookie
+       وبيتحمّل عند الطلب (click-to-load) بس. فيديو الحجاز كار صولفيج
+       غنائي بيغطّي المقام، مش فيديو تدريب سلّم مستقل زي الباقيين. */
+    var HUMAN_SCALE_VIDEOS = {
+      hijaz:    { id: "wtoO6L1Q2d0", teacher: "إبراهيم صبري", title: "ازاي تقول المجس الحجازي", kind: "scale" },
+      rast:     { id: "YlGUKLn8Olw", teacher: "أحمد شفيق", title: "التدريب علي سلم مقام الراست كامل", kind: "scale" },
+      bayati:   { id: "ya1EkPAR9po", teacher: "أحمد شفيق", title: "التدريب علي سلم مقام البياتي كامل", kind: "scale" },
+      nahawand: { id: "lD5sNt0Q9FY", teacher: "أحمد شفيق", title: "التدريب علي سلم مقام النهاوند كامل", kind: "scale" },
+      kurd:     { id: "fRi0Xf14EWY", teacher: "أحمد شفيق", title: "التدريب علي سلم مقام الكرد كامل", kind: "scale" },
+      saba:     { id: "Jab9kYIcqjQ", teacher: "أحمد شفيق", title: "التدريب علي سلم مقام الصبا كامل", kind: "scale" },
+      sikah:    { id: "h7wQ6gYQWHo", teacher: "أحمد شفيق", title: "التدريب علي سلم مقام السيكاه كامل", kind: "scale" },
+      ajam:     { id: "TzkdPus_l1c", teacher: "أحمد شفيق", title: "التدريب علي سلم مقام العجم كامل", kind: "scale" },
+      hijazkar: { id: "bW7eVxAMxo0", teacher: "Musication", title: "صولفيج غنائي — مقام حجاز كار", kind: "solfege" }
+    };
+    /* ════════════════ نفس المقام بصوت إبراهيم صبري — فيسبوك وتيك توك ════════════════
+       سلسلته «تعليم مقام X بسهوله بدون اله» على فيسبوك بتغطّي ٨ من ٩ مقامات
+       بصوته البشري (الحجاز كار مش موجود عنده في أي حتة). المشغّل هو إضافة
+       فيديو فيسبوك الرسمية وبتتحمّل عند الطلب بس، وتحت المشغّل على طول
+       روابط «افتح على فيسبوك / TikTok» دايمًا باينة — لأن المتصفحات اللي
+       جوه التطبيقات ممكن تحجب مشغّل فيسبوك نفسه. */
+    var SABRY_VIDEOS = {
+      rast: { fb: "https://www.facebook.com/ابراهيم-صبري-Ibrahim-Sabry-106680092404703/videos/مقام-الراست-بسهوله-/537254968589216/", tiktok: "https://www.tiktok.com/@ibrahimsabry.official/video/7101654227189091590" },
+      bayati: { fb: "https://www.facebook.com/ibrahimsabryo/videos/919657159087809/", tiktok: "https://www.tiktok.com/@ibrahimsabry.official/video/7113682288218557701" },
+      nahawand: { fb: "https://www.facebook.com/ibrahimsabryo/videos/مقام-النهاوند-️/911719806721178/" },
+      kurd: { fb: "https://www.facebook.com/ibrahimsabryo/videos/مقام-الكرد-️/167486889585282/", tiktok: "https://www.tiktok.com/@ibrahimsabry.official/video/7114794758756699398" },
+      saba: { fb: "https://www.facebook.com/ابراهيم-صبري-Ibrahim-Sabry-106680092404703/videos/مقام-الصبا-/557252539824843/", tiktok: "https://www.tiktok.com/@ibrahimsabry.official/video/7103643490655030534" },
+      sikah: { fb: "https://www.facebook.com/ابراهيم-صبري-Ibrahim-Sabry-106680092404703/videos/مقام-السيكا-️/205219472276949/", tiktok: "https://www.tiktok.com/@ibrahimsabry.official/video/7107207527707839750" },
+      ajam: { fb: "https://www.facebook.com/ibrahimsabryo/videos/مقام-العجم-/782030223367937/", tiktok: "https://www.tiktok.com/@ibrahimsabry.official/video/7109092016767716613" },
+      hijaz: { fb: "https://www.facebook.com/ibrahimsabryo/videos/3365983810307964/", tiktok: "https://www.tiktok.com/@ibrahimsabry.official/video/7546266864041659666" },
+    };
+
+    function fbFacadeHtml(m) {
+      return "<div class='yt-wrap yt-facade'><button type='button' class='yt-load-btn' data-fb-load='" + m.id + "' aria-label='شغّل فيديو إبراهيم صبري لمقام " + esc(m.name) + " على فيسبوك'>" +
+        "<span class='yt-play-ic' aria-hidden='true'>▶</span><span>▶ شغّل فيديو إبراهيم صبري — اسمع وقول وراه</span>" +
+        "<span class='yt-load-sub'>بيفتح مشغّل فيديو فيسبوك الرسمي عند الدوس بس — ولو محمّلش جوه المتصفح، افتحه من زرار «افتح على فيسبوك» اللي تحته على طول</span></button></div>";
+    }
+    function bindFbFacades(root) {
+      if (!root || !root.querySelectorAll) return;
+      var btns = root.querySelectorAll("[data-fb-load]");
+      Array.prototype.forEach.call(btns, function(btn) {
+        btn.addEventListener("click", function() {
+          var s = SABRY_VIDEOS[btn.getAttribute("data-fb-load")];
+          if (!s) return;
+          var wrap = btn.parentNode;
+          wrap.classList.remove("yt-facade");
+          wrap.innerHTML = "<iframe src='https://www.facebook.com/plugins/video.php?href=" + encodeURIComponent(s.fb) + "&show_text=false' title='مشغّل فيديو فيسبوك — إبراهيم صبري' allow='autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share' allowfullscreen referrerpolicy='strict-origin-when-cross-origin'></iframe>";
+        });
+      });
+    }
+    function sabryBlockHtml(m) {
+      if (m.id === "hijazkar") {
+        return "<div class='sabry-block'><p class='small' style='margin:0'><strong>إبراهيم صبري:</strong> <span class='dim'>معندوش درس لمقام الحجاز كار — لا على فيسبوك ولا على TikTok — فمرجع المقام ده هنا هو درس الصولفيج اللي فوق بس.</span></p></div>";
+      }
+      var s = SABRY_VIDEOS[m.id];
+      if (!s) return "";
+      return "<div class='sabry-block'><h4>🎤 نفس المقام بصوت إبراهيم صبري</h4>" +
+        "<p class='small dim' style='margin:.35rem 0 0'>نفس سلّم مقام " + esc(m.name) + " بصوت <strong>إبراهيم صبري</strong> نفسه، من سلسلته «تعليم المقام بسهوله بدون آلة» على فيسبوك — بيقول السلّم بصوته البشري، اسمعه وقول وراه.</p>" +
+        fbFacadeHtml(m) +
+        "<div class='row' style='margin-top:.6rem'>" +
+          "<a class='btn-ghost ext-link' href='" + esc(s.fb) + "' target='_blank' rel='noopener' aria-label='افتح فيديو إبراهيم صبري لمقام " + esc(m.name) + " على فيسبوك'>📘 افتح على فيسبوك</a>" +
+          (s.tiktok ? "<a class='btn-ghost ext-link' href='" + esc(s.tiktok) + "' target='_blank' rel='noopener' aria-label='افتح فيديو إبراهيم صبري لمقام " + esc(m.name) + " على TikTok'>🎵 افتح على TikTok</a>" : "") +
+        "</div>" +
+        (s.tiktok ? "" : "<p class='tiny dim' style='margin:.45rem 0 0'>على TikTok مفيش فيديو سلّم لمقام " + esc(m.name) + " من إبراهيم صبري (اللي هناك موّال على المقام، مش تدريب سلّم) — عشان كده المقام ده على فيسبوك بس.</p>") +
+        "</div>";
+    }
+
+
+    function ytFacadeHtml(videoId, label) {
+      return "<div class='yt-wrap yt-facade'><button type='button' class='yt-load-btn' data-yt-load='" + videoId + "' aria-label='شغّل فيديو " + esc(label) + "'>" +
+        "<span class='yt-play-ic' aria-hidden='true'>▶</span><span>▶ شغّل الفيديو — اسمع وقول وراه</span>" +
+        "<span class='yt-load-sub'>بيفتح مشغّل يوتيوب الرسمي (youtube-nocookie) عند الدوس بس</span></button></div>";
+    }
+    function bindYtFacades(root) {
+      if (!root) return;
+      bindFbFacades(root);
+      var btns = root.querySelectorAll ? root.querySelectorAll("[data-yt-load]") : [];
+      Array.prototype.forEach.call(btns, function(btn) {
+        btn.addEventListener("click", function() {
+          var id = btn.getAttribute("data-yt-load");
+          var wrap = btn.parentNode;
+          wrap.classList.remove("yt-facade");
+          wrap.innerHTML = "<iframe src='https://www.youtube-nocookie.com/embed/" + id + "?autoplay=1&rel=0' title='مشغّل يوتيوب — سلّم بصوت بشري حقيقي' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' allowfullscreen referrerpolicy='strict-origin-when-cross-origin'></iframe>";
+        });
+      });
+    }
+    function humanScaleCardHtml(m, headingTag) {
+      var v = HUMAN_SCALE_VIDEOS[m.id];
+      if (!v) return "";
+      var tag = headingTag || "h3";
+      var line = v.kind === "solfege"
+        ? "ده درس صولفيج غنائي بصوت بشري بيغطّي مقام " + m.name + " وبيغنّي نغماته — وهو المرجع البشري المتاح للمقام ده (مش فيديو تدريب سلّم مستقل زي باقي المقامات). اسمع المدرّب وقول وراه بصوتك."
+        : "ده صوت مدرّب بشري حقيقي بيغنّي سلّم مقام " + m.name + " كامل نغمة نغمة — اسمعه وقول وراه بصوتك، وبعدين كمّل تدريبك التفاعلي تحت.";
+      return "<div class='human-scale-card'><" + tag + ">🎤 اسمع السلّم بصوت بشري حقيقي — وقول وراه</" + tag + ">" +
+        "<p class='small dim' style='margin:.35rem 0 0'>" + esc(line) + "</p>" +
+        "<p class='small' style='margin:.35rem 0 0'><strong>" + esc(v.teacher) + "</strong> — " + esc(v.title) + " <span class='dim'>(يوتيوب)</span></p>" +
+        ytFacadeHtml(v.id, v.title) + sabryBlockHtml(m) + "</div>";
+    }
+
+    function ytEmbedHtml(videoId) {
+      return "<div class='yt-wrap'><iframe src='https://www.youtube-nocookie.com/embed/" + videoId + "' title='مشغّل يوتيوب — تقاسيم عبده داغر' loading='lazy' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' allowfullscreen referrerpolicy='strict-origin-when-cross-origin'></iframe></div>";
+    }
+    function dagherVideoHtml(v) {
+      return "<div class='dagher-video'><h4>" + esc(v.title) + "</h4>" +
+        "<p class='small dim' style='margin:.3rem 0 0'><strong>ركّز وانت بتسمع:</strong> " + esc(v.listen) + "</p>" +
+        ytEmbedHtml(v.id) + "</div>";
+    }
+
+    var CHORD_TYPES = [
+      { id:"maj", name:"كبير (ميجور)", suffix:"", intervals:[0,4,7], use:"الأساس المشرق؛ كورد الركوز في العجم والنهاوند." },
+      { id:"min", name:"صغير (مينور)", suffix:"m", intervals:[0,3,7], use:"كورد الركوز في الكرد والنهاوند والبياتي — قلب الأغاني العاطفية." },
+      { id:"7", name:"سابع مهيمن", suffix:"7", intervals:[0,4,7,10], use:"يشدّ الأذن للرجوع للركوز؛ قفلات الحجاز والبلوز." },
+      { id:"maj7", name:"سابع كبير", suffix:"maj7", intervals:[0,4,7,11], use:"لون ناعم حالم للأغاني الرومانسية الهادئة." },
+      { id:"m7", name:"سابع صغير", suffix:"m7", intervals:[0,3,7,10], use:"مينور أدفى وأغنى؛ مرافقة مثالية للبياتي والكرد." },
+      { id:"dim", name:"ناقص", suffix:"dim", intervals:[0,3,6], use:"كورد عبور متوتر يربط بين كوردين." },
+      { id:"aug", name:"زائد", suffix:"aug", intervals:[0,4,8], use:"لون حالم معلّق، يظهر في قفلات الحجاز كار." },
+      { id:"sus4", name:"معلّق رابع", suffix:"sus4", intervals:[0,5,7], use:"تعليق قبل الحل؛ جميل قبل قفلة المذهب." },
+      { id:"m7b5", name:"نصف ناقص", suffix:"m7♭5", intervals:[0,3,6,10], use:"لون حزين متقدم لأغاني النهاوند المرصّع." },
+      { id:"6", name:"سادس", suffix:"6", intervals:[0,4,7,9], use:"خاتمة دافئة على طراز الأغاني القديمة." }
+    ];
+
+    var ROOTS = [
+      { name:"C", midi:60 }, { name:"D♭", midi:61 }, { name:"D", midi:62 }, { name:"E♭", midi:63 },
+      { name:"E", midi:64 }, { name:"F", midi:65 }, { name:"G♭", midi:66 }, { name:"G", midi:67 },
+      { name:"A♭", midi:68 }, { name:"A", midi:69 }, { name:"B♭", midi:70 }, { name:"B", midi:71 }
+    ];
+    var PC_NAMES = ["C","D♭","D","E♭","E","F","G♭","G","A♭","A","B♭","B"];
+
+    var PROGRESSIONS = [
+      { title:"دوران الكرد والنهاوند الشعبي", maqamHint:"كرد / نهاوند على A",
+        chords:[{root:69,type:"min",label:"Am"},{root:67,type:"maj",label:"G"},{root:65,type:"maj",label:"F"},{root:64,type:"maj",label:"E"}],
+        tip:"أشهر دوران في الأغنية العربية الحديثة (أنت عمري وأخواتها). الشمال: باص على أول كل مازورة، واليمين تضرب الكورد على «التك» في إيقاع الوحدة." },
+      { title:"قفلة الحجاز", maqamHint:"حجاز على D",
+        chords:[{root:62,type:"min",label:"Dm"},{root:63,type:"maj",label:"E♭"},{root:62,type:"min",label:"Dm"},{root:69,type:"7",label:"A7"}],
+        tip:"الـE♭ الجار المباشر للـDm هو لون الحجاز كله. جرّب تضيف F♯ في اليمين فوق الـDm لتقليد جنس الحجاز." },
+      { title:"بوب العجم المشرق", maqamHint:"عجم على C",
+        chords:[{root:60,type:"maj",label:"C"},{root:67,type:"maj",label:"G"},{root:69,type:"min",label:"Am"},{root:65,type:"maj",label:"F"}],
+        tip:"دوران I–V–vi–IV العالمي؛ في العربي يُعزف بإيقاع الوحدة أو المقسوم فيعطي إحساسًا احتفاليًا فوريًا." },
+      { title:"شجن البياتي", maqamHint:"بياتي على D",
+        chords:[{root:62,type:"m7",label:"Dm7"},{root:67,type:"m7",label:"Gm7"},{root:62,type:"m7",label:"Dm7"},{root:69,type:"7",label:"A7"}],
+        tip:"الكوردات وحدها غربية النكهة؛ اللون البياتي ييجي من اللحن والـE half-flat في اليمين أو الصوت." }
+    ];
+
+    function maqamById(id) { for (var i=0;i<MAQAMAT.length;i++) if (MAQAMAT[i].id===id) return MAQAMAT[i]; return MAQAMAT[0]; }
+    function chordTypeById(id) { for (var i=0;i<CHORD_TYPES.length;i++) if (CHORD_TYPES[i].id===id) return CHORD_TYPES[i]; return CHORD_TYPES[0]; }
+    function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+    </script>
+
+    <script>
+    "use strict";
+    /* ════════════════ محرك الصوت: تشغيل عبر عناصر وسائط (قناة الفيديو) ════════════════
+       جوه متصفحات iOS الداخلية، صوت WebAudio بيعدي على قناة الجرس وبيتكتم،
+       لكن تشغيل <audio> بيعدي على قناة الوسائط وبيتسمع دايمًا. كل نغمة بتتولّد
+       مرة واحدة كملف WAV صغير وبتتلعب من مجموعة عناصر جاهزة. */
+    var freqOf = function(midiFloat) { return 440 * Math.pow(2, (midiFloat - 69) / 12); };
+
+    var audioCtx = null;
+    function getAudio() {
+      if (!audioCtx) {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AC();
+      }
+      if (audioCtx.state !== "running") { audioCtx.resume().catch(function(){}); }
+      return audioCtx;
+    }
+
+    var TONE_SR = 22050;
+    var wavCache = {};
+    var silentWavUrl = null;
+
+    function wavBlobUrl(samples) {
+      var n = samples.length;
+      var buf = new ArrayBuffer(44 + n * 2);
+      var v = new DataView(buf);
+      function wstr(off, s) { for (var i = 0; i < s.length; i++) v.setUint8(off + i, s.charCodeAt(i)); }
+      wstr(0, "RIFF"); v.setUint32(4, 36 + n * 2, true);
+      wstr(8, "WAVE"); wstr(12, "fmt ");
+      v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+      v.setUint32(24, TONE_SR, true); v.setUint32(28, TONE_SR * 2, true);
+      v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+      wstr(36, "data"); v.setUint32(40, n * 2, true);
+      for (var i = 0; i < n; i++) {
+        var s = Math.max(-1, Math.min(1, samples[i]));
+        v.setInt16(44 + i * 2, Math.round(s * 32767), true);
+      }
+      return URL.createObjectURL(new Blob([buf], { type: "audio/wav" }));
+    }
+
+    function toneWavUrl(midiFloat, dur) {
+      var key = midiFloat.toFixed(2) + "|" + dur.toFixed(2);
+      if (wavCache[key]) return wavCache[key];
+      var f = freqOf(midiFloat);
+      var total = Math.max(1, Math.round((dur + 0.08) * TONE_SR));
+      var samples = new Float32Array(total);
+      for (var i = 0; i < total; i++) {
+        var t = i / TONE_SR;
+        var attack = Math.min(1, t / 0.02);
+        var decay = Math.exp((-6.9 * t) / Math.max(dur, 0.05));
+        var env = attack * Math.max(decay, 0.0009);
+        var ph = 2 * Math.PI * f * t;
+        var tri = (2 / Math.PI) * Math.asin(Math.sin(ph));
+        var harm = 0.25 * Math.sin(2 * ph);
+        samples[i] = env * (tri * 0.85 + harm) * 0.9;
+      }
+      var url = wavBlobUrl(samples);
+      wavCache[key] = url;
+      return url;
+    }
+
+    function getSilentWavUrl() {
+      if (!silentWavUrl) silentWavUrl = wavBlobUrl(new Float32Array(Math.round(TONE_SR * 0.05)));
+      return silentWavUrl;
+    }
+
+    var POOL_SIZE = 6;
+    var pool = [];
+    var poolIdx = 0;
+    var poolPrimed = false;
+    function ensurePool() {
+      if (pool.length === 0) {
+        for (var i = 0; i < POOL_SIZE; i++) {
+          var el = new Audio();
+          el.preload = "auto";
+          pool.push(el);
+        }
+      }
+      return pool;
+    }
+
+    function unlockAudio() {
+      try {
+        if (navigator.audioSession && navigator.audioSession.type !== "playback") {
+          navigator.audioSession.type = "playback";
+        }
+      } catch (e) { /* Audio Session API غير مدعومة */ }
+      if (!poolPrimed) {
+        var els = ensurePool();
+        var silent = getSilentWavUrl();
+        poolPrimed = true;
+        els.forEach(function(el) {
+          try {
+            el.src = silent;
+            var p = el.play();
+            if (p) {
+              p.then(function() { el.pause(); el.currentTime = 0; }).catch(function() { poolPrimed = false; });
+            }
+          } catch (e) { poolPrimed = false; }
+        });
+      }
+      try {
+        var ac = getAudio();
+        if (ac.state !== "running") ac.resume().catch(function(){});
+      } catch (e) { /* المايك هيحاول تاني لوحده */ }
+    }
+
+    function playTone(midiFloat, dur, when, volume) {
+      dur = dur == null ? 0.7 : dur;
+      when = when == null ? 0 : when;
+      volume = volume == null ? 0.22 : volume;
+      function fire() {
+        var els = ensurePool();
+        var el = els[poolIdx % els.length];
+        poolIdx += 1;
+        if (!el) return;
+        try {
+          el.src = toneWavUrl(midiFloat, dur);
+          el.volume = Math.max(0, Math.min(1, volume * 3.2));
+          el.currentTime = 0;
+          var p = el.play();
+          if (p) p.catch(function(){});
+        } catch (e) { /* أفضل جهد لكل نغمة */ }
+      }
+      if (when > 0) setTimeout(fire, when * 1000); else fire();
+    }
+
+    function playChord(midis, arpeggiate) {
+      midis.forEach(function(m, i) {
+        playTone(m, arpeggiate ? 0.9 : 1.1, arpeggiate ? i * 0.13 : 0, 0.18);
+      });
+    }
+
+    function playSequence(midis, stepMs, onNote, onDone) {
+      var cancelled = false;
+      var timers = [];
+      midis.forEach(function(m, i) {
+        timers.push(setTimeout(function() {
+          if (cancelled) return;
+          if (onNote) onNote(i);
+          playTone(m, Math.min(0.9, stepMs / 1000 + 0.25));
+        }, i * stepMs));
+      });
+      timers.push(setTimeout(function() { if (!cancelled && onDone) onDone(); }, midis.length * stepMs + 60));
+      return { cancel: function() { cancelled = true; timers.forEach(clearTimeout); } };
+    }
+
+    /* ════════════════ صوت غنائي بشري: المدرب بيغنّي مش بيعزف ════════════════
+       في تعليم الغنا، المقام والجُمَل لازم تتغنّى بصوت بشري مش تتعزف نوتات.
+       الصوت ده متولّد بتوليف صوتي (فورمانت) لحرف «آ»: مصدر توافقي غني
+       بيعدّي على رنينات الحلق والفم، مع فيبراتو بيكبر تدريجيًا زي صوت
+       المغنّي الحقيقي ونَفَس خفيف — وكل نغمة بتتغنّى بدرجتها بالظبط،
+       بما فيها الربع تون، وبتتلعب من نفس قناة الوسائط فبتتسمع دايمًا. */
+    var VOICE_FORMANTS = [ [730, 80, 1], [1090, 90, 0.55], [2440, 120, 0.22] ]; /* [تردد, عرض, قوة] لحرف «آ» */
+    function voiceWavUrl(midiFloat, dur) {
+      var key = "voice|" + midiFloat.toFixed(2) + "|" + dur.toFixed(2);
+      if (wavCache[key]) return wavCache[key];
+      var f0 = freqOf(midiFloat);
+      var total = Math.max(1, Math.round((dur + 0.18) * TONE_SR));
+      var samples = new Float32Array(total);
+      var maxH = Math.min(48, Math.floor(9800 / f0));
+      var amps = [];
+      var peak = 0;
+      var h, k;
+      for (h = 1; h <= maxH; h++) {
+        var fh = f0 * h;
+        var a = 0;
+        for (k = 0; k < VOICE_FORMANTS.length; k++) {
+          var F = VOICE_FORMANTS[k][0], B = VOICE_FORMANTS[k][1], G = VOICE_FORMANTS[k][2];
+          var d = (fh - F) / B;
+          a += G / (1 + d * d);
+        }
+        a *= 1 / Math.pow(h, 0.35);
+        amps.push(a);
+        if (a > peak) peak = a;
+      }
+      if (peak > 0) for (var j = 0; j < amps.length; j++) amps[j] /= peak;
+      var phase = 0;
+      var seed = 22222;
+      function rnd() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x40000000 - 1; }
+      for (var i = 0; i < total; i++) {
+        var t = i / TONE_SR;
+        var vibRamp = Math.min(1, Math.max(0, (t - 0.14) / 0.3));
+        var vib = 1 + 0.016 * vibRamp * Math.sin(2 * Math.PI * 5.3 * t);
+        phase += (2 * Math.PI * f0 * vib) / TONE_SR;
+        var attack = Math.min(1, t / 0.07);
+        attack = attack * attack * (3 - 2 * attack);
+        var rel = Math.min(1, Math.max(0, (dur + 0.18 - t) / 0.16));
+        var env = attack * Math.min(1, rel * 1.6);
+        var s = 0;
+        for (var hh = 0; hh < amps.length; hh++) s += amps[hh] * Math.sin(phase * (hh + 1));
+        s += rnd() * 0.012; /* نَفَس خفيف */
+        samples[i] = env * s * 0.3;
+      }
+      var url = wavBlobUrl(samples);
+      wavCache[key] = url;
+      return url;
+    }
+
+    function playVoice(midiFloat, dur, when, volume) {
+      dur = dur == null ? 0.85 : dur;
+      when = when == null ? 0 : when;
+      volume = volume == null ? 0.3 : volume;
+      function fire() {
+        var els = ensurePool();
+        var el = els[poolIdx % els.length];
+        poolIdx += 1;
+        if (!el) return;
+        try {
+          el.src = voiceWavUrl(midiFloat, dur);
+          el.volume = Math.max(0, Math.min(1, volume * 3.2));
+          el.currentTime = 0;
+          var p = el.play();
+          if (p) p.catch(function(){});
+        } catch (e) { /* أفضل جهد لكل نغمة مغنّاة */ }
+      }
+      if (when > 0) setTimeout(fire, when * 1000); else fire();
+    }
+
+    /* المدرب بيغنّي التسلسل كله بصوته البشري، نغمة ورا نغمة بإيقاع غنائي */
+    function playVoiceSequence(midis, stepMs, onNote, onDone) {
+      var cancelled = false;
+      var timers = [];
+      midis.forEach(function(m, i) {
+        timers.push(setTimeout(function() {
+          if (cancelled) return;
+          if (onNote) onNote(i);
+          playVoice(m, Math.min(1.25, stepMs / 1000 + 0.45));
+        }, i * stepMs));
+      });
+      timers.push(setTimeout(function() { if (!cancelled && onDone) onDone(); }, midis.length * stepMs + 120));
+      return { cancel: function() { cancelled = true; timers.forEach(clearTimeout); } };
+    }
+
+    /* ════════════════ أسماء النغمات (ربع تون، إنجليزي) ════════════════ */
+    var QUARTER_NAMES = [
+      "C","C half-sharp","C♯","D half-flat","D","D half-sharp",
+      "E♭","E half-flat","E","E half-sharp","F","F half-sharp",
+      "F♯","G half-flat","G","G half-sharp","A♭","A half-flat",
+      "A","A half-sharp","B♭","B half-flat","B","B half-sharp"
+    ];
+    function englishNoteName(midiFloat) {
+      var q = Math.round((midiFloat - 60) * 2);
+      var idx = ((q % 24) + 24) % 24;
+      return QUARTER_NAMES[idx] || "C";
+    }
+    function foldToTarget(detected, target) {
+      var d = detected;
+      while (d - target > 6) d -= 12;
+      while (target - d > 6) d += 12;
+      return d;
+    }
+
+    /* ════════════════ كشف النغمة: ارتباط ذاتي + تنعيم وسيط ════════════════ */
+    function autoCorrelate(buf, sampleRate) {
+      var rms = 0, i, v;
+      for (i = 0; i < buf.length; i++) { v = buf[i]; rms += v * v; }
+      rms = Math.sqrt(rms / buf.length);
+      if (rms < 0.008) return -1;
+      var r1 = 0, r2 = buf.length - 1, thres = 0.2;
+      for (i = 0; i < buf.length / 2; i++) { if (Math.abs(buf[i]) < thres) { r1 = i; break; } }
+      for (i = 1; i < buf.length / 2; i++) { if (Math.abs(buf[buf.length - i]) < thres) { r2 = buf.length - i; break; } }
+      var b = buf.slice(r1, r2);
+      var size = b.length;
+      if (size < 64) return -1;
+      var c = new Float32Array(size);
+      var j;
+      for (i = 0; i < size; i++) {
+        var s = 0;
+        for (j = 0; j < size - i; j++) s += b[j] * b[j + i];
+        c[i] = s;
+      }
+      var d = 0;
+      while (d < size - 1 && c[d] > c[d + 1]) d++;
+      var maxVal = -1, maxPos = -1;
+      for (i = d; i < size; i++) { if (c[i] > maxVal) { maxVal = c[i]; maxPos = i; } }
+      if (maxPos <= 0) return -1;
+      var T0 = maxPos;
+      var x1 = c[T0 - 1] || 0, x2 = c[T0] || 0, x3 = c[T0 + 1] || 0;
+      var a = (x1 + x3 - 2 * x2) / 2;
+      var bb = (x3 - x1) / 2;
+      if (a !== 0) T0 = T0 - bb / (2 * a);
+      return sampleRate / T0;
+    }
+
+    /* وسيط آخر ٥ قراءات + اتفاق ٣ منها على نفس ربع التون = قراءة مستقرة */
+    function PitchSmoother() { this.hist = []; }
+    PitchSmoother.prototype.push = function(midi) {
+      if (midi == null) { this.hist = []; return null; }
+      this.hist.push(midi);
+      if (this.hist.length > 5) this.hist.shift();
+      if (this.hist.length < 3) return null;
+      var sorted = this.hist.slice().sort(function(a, b) { return a - b; });
+      var median = sorted[Math.floor(sorted.length / 2)];
+      var q = Math.round(median * 2) / 2;
+      var agree = 0;
+      for (var i = 0; i < this.hist.length; i++) {
+        if (Math.abs(Math.round(this.hist[i] * 2) / 2 - q) < 0.01) agree++;
+      }
+      return agree >= 3 ? median : null;
+    };
+    PitchSmoother.prototype.reset = function() { this.hist = []; };
+
+    /* ════════════════ البيانو ════════════════ */
+    var WHITE_PCS = { 0:1, 2:1, 4:1, 5:1, 7:1, 9:1, 11:1 };
+    function buildPiano(container, opts) {
+      opts = opts || {};
+      var low = opts.low || 48, high = opts.high || 76;
+      container.innerHTML = "";
+      var root = document.createElement("div");
+      root.className = "piano";
+      root.setAttribute("role", "group");
+      root.setAttribute("aria-label", "بيانو تفاعلي");
+      var whitesRow = document.createElement("div");
+      whitesRow.className = "whites";
+      root.appendChild(whitesRow);
+      var whites = [], blacks = [], keyEls = {};
+      var m;
+      for (m = low; m <= high; m++) { if (WHITE_PCS[m % 12]) whites.push(m); else blacks.push(m); }
+      var state = { highlights: [], active: null, pressed: null, pressTimer: null };
+
+      function isHl(mm) {
+        return state.highlights.some(function(h) { return Math.abs(Math.round(h) - mm) < 1 && Math.abs(h - mm) <= 0.51; });
+      }
+      function isQuarter(mm) {
+        return state.highlights.some(function(h) { return Math.abs(h - mm) > 0.24 && Math.abs(h - mm) <= 0.51; });
+      }
+      function isAct(mm) {
+        return (state.active != null && Math.abs(state.active - mm) <= 0.51) || state.pressed === mm;
+      }
+      function paint() {
+        Object.keys(keyEls).forEach(function(k) {
+          var mm = Number(k), el = keyEls[k];
+          el.classList.toggle("hl", isHl(mm) && !isAct(mm));
+          el.classList.toggle("act", isAct(mm));
+        });
+      }
+      function press(mm) {
+        state.pressed = mm;
+        paint();
+        if (state.pressTimer) clearTimeout(state.pressTimer);
+        state.pressTimer = setTimeout(function() { state.pressed = null; paint(); }, 280);
+        playTone(mm, 0.8);
+        if (opts.onPress) opts.onPress(mm);
+      }
+      whites.forEach(function(mm) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "wkey";
+        btn.setAttribute("aria-label", "نغمة " + englishNoteName(mm));
+        if (isQuarter(mm)) { /* تُرسم الشارة عند التلوين */ }
+        if (mm % 12 === 0) {
+          var lab = document.createElement("span");
+          lab.className = "c-label";
+          lab.textContent = "C" + (Math.floor(mm / 12) - 1);
+          btn.appendChild(lab);
+        }
+        var qb = document.createElement("span");
+        qb.className = "q-badge hidden";
+        qb.textContent = "¼";
+        btn.appendChild(qb);
+        btn._qbadge = qb;
+        btn.addEventListener("click", function() { press(mm); });
+        whitesRow.appendChild(btn);
+        keyEls[mm] = btn;
+      });
+      blacks.forEach(function(mm) {
+        var whitesBefore = whites.filter(function(w) { return w < mm; }).length;
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "bkey";
+        btn.setAttribute("aria-label", "نغمة " + englishNoteName(mm));
+        btn.style.left = (whitesBefore / whites.length) * 100 + "%";
+        btn.style.width = Math.min(9, 90 / whites.length) + "%";
+        btn.style.maxWidth = "34px";
+        btn.addEventListener("click", function() { press(mm); });
+        root.appendChild(btn);
+        keyEls[mm] = btn;
+      });
+      container.appendChild(root);
+      return {
+        setHighlights: function(list) {
+          state.highlights = list || [];
+          Object.keys(keyEls).forEach(function(k) {
+            var mm = Number(k), el = keyEls[k];
+            if (el._qbadge) el._qbadge.classList.toggle("hidden", !isQuarter(mm));
+          });
+          paint();
+        },
+        setActive: function(mm) { state.active = mm; paint(); }
+      };
+    }
+
+    /* مشغّل تسلسل بسيط يلوّن النغمة الحالية */
+    function makeSequencer(onActive) {
+      var handle = null;
+      return {
+        play: function(midis, stepMs) {
+          if (handle) handle.cancel();
+          handle = playSequence(midis, stepMs || 430, function(i) { onActive(midis[i], i); }, function() { onActive(null, -1); });
+        },
+        stop: function() { if (handle) handle.cancel(); onActive(null, -1); }
+      };
+    }
+
+    /* أزرار نغمات قابلة للدوس مع وميض */
+    function noteChips(container, notes, baseMidi, onActiveIdx) {
+      container.innerHTML = "";
+      var row = document.createElement("div");
+      row.className = "row";
+      row.style.gap = ".4rem";
+      notes.forEach(function(n, i) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "chip-btn";
+        btn.textContent = n.label;
+        btn.setAttribute("aria-label", "اسمع نغمة " + n.label);
+        btn.addEventListener("click", function() {
+          btn.classList.add("on");
+          setTimeout(function() { btn.classList.remove("on"); }, 300);
+          playTone(baseMidi + n.semi, 0.8);
+        });
+        btn._idx = i;
+        row.appendChild(btn);
+      });
+      container.appendChild(row);
+      return {
+        setActiveIdx: function(idx) {
+          Array.prototype.forEach.call(row.children, function(btn) {
+            btn.classList.toggle("on", btn._idx === idx);
+          });
+          if (onActiveIdx) onActiveIdx(idx);
+        }
+      };
+    }
+    </script>
+
+    <script>
+    "use strict";
+    /* ════════════════ التنقّل بين التبويبات ════════════════ */
+    var TABS = [
+      { id: "coach", label: "🎤 المدرب اللايف" },
+      { id: "sing", label: "🗣️ مدرّس الغنا" },
+      { id: "analyzer", label: "🔍 المحلل اللايف" },
+      { id: "maqamat", label: "المقامات" },
+      { id: "piano", label: "البيانو والكوردات" },
+      { id: "plan", label: "📅 خطة اليوم" }
+    ];
+    var currentTab = "coach";
+    var tabbarEl = document.getElementById("tabbar");
+    TABS.forEach(function(t) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "tab-btn";
+      b.textContent = t.label;
+      b.setAttribute("aria-label", "قسم " + t.label);
+      b.dataset.tab = t.id;
+      b.addEventListener("click", function() { showTab(t.id); });
+      tabbarEl.appendChild(b);
+    });
+    function showTab(id) {
+      currentTab = id;
+      TABS.forEach(function(t) {
+        document.getElementById("panel-" + t.id).classList.toggle("hidden", t.id !== id);
+      });
+      Array.prototype.forEach.call(tabbarEl.children, function(b) {
+        if (b.dataset.tab === id) b.setAttribute("aria-current", "page");
+        else b.removeAttribute("aria-current");
+      });
+      window.scrollTo(0, 0);
+    }
+
+    /* ════════════════ المدرب اللايف ════════════════ */
+    function scaleTargets(m, both) {
+      var up = m.notes.map(function(n) { return { label: n[0], midi: m.tonicMidi + n[1] }; });
+      if (!both) return up;
+      var down = m.notes.slice().reverse().slice(1).map(function(n) { return { label: n[0], midi: m.tonicMidi + n[1] }; });
+      return up.concat(down);
+    }
+    function phraseTargets(m, phrase) {
+      return phrase.notes.map(function(s) {
+        var rel = ((s % 12) + 12) % 12;
+        var best = m.notes[0];
+        m.notes.forEach(function(n) { if (Math.abs(n[1] - rel) < Math.abs(best[1] - rel)) best = n; });
+        return { label: best[0], midi: m.tonicMidi + s };
+      });
+    }
+
+    var coach = {
+      title: "تدريب حر — أي مقام",
+      targets: [],
+      freeScale: null,
+      voice: false,
+      index: 0, hits: 0, misses: 0, finished: false,
+      listening: false, starting: false,
+      detected: null, freq: null, level: 0,
+      stream: null, raf: 0, analyser: null, ac: null,
+      holdSince: null, wrongSince: null, countedWrong: false,
+      smoother: new PitchSmoother(),
+      heard: false, startedAt: 0
+    };
+
+    var el = function(id) { return document.getElementById(id); };
+    var micStatusEl = el("mic-status"), micStatusText = el("mic-status-text");
+    var micBtn = el("btn-mic"), micErrorEl = el("mic-error");
+    var liveUi = el("live-ui"), levelFill = el("level-fill"), levelText = el("level-text"), noSoundNote = el("nosound-note");
+
+    function setMicStatus(state, text) {
+      micStatusEl.classList.toggle("live", state === "live");
+      micStatusEl.classList.toggle("err", state === "err");
+      micStatusText.textContent = text;
+    }
+    function showMicError(msg) {
+      if (msg) { micErrorEl.textContent = msg; micErrorEl.classList.remove("hidden"); }
+      else micErrorEl.classList.add("hidden");
+    }
+
+    function micErrorMessage(e) {
+      var name = (e && e.name) || "";
+      var msg = (e && e.message) || "";
+      if (msg === "mic-unavailable") {
+        return "المتصفح اللي فاتح الصفحة دي مش بيدعم المايك الحي أصلًا — عشان كده مفيش طلب إذن بيظهر. ده بيحصل جوه المتصفحات اللي جوه التطبيقات. الحل: افتح الصفحة دي في متصفح Safari نفسه (شوف الخطوات فوق) وهناك هيظهر طلب الإذن والمايك هيشتغل لايف.";
+      }
+      if (msg === "mic-timeout") {
+        return "المتصفح ماردّش على طلب المايك. لو انت جوه متصفح تطبيق تاني، افتح الصفحة في Safari نفسه. ولو انت في Safari فعلًا، اقفل أي تطبيق بيستخدم المايك وحاول تاني.";
+      }
+      if (name === "NotAllowedError" || name === "SecurityError") {
+        return "إذن المايك اترفض. لو عايز تفعّله: الإعدادات > Safari > المايكروفون، أو دوس على «aA» في شريط العنوان في Safari واختر إعدادات الموقع واسمح بالمايك، وبعدين حاول تاني.";
+      }
+      if (name === "NotFoundError" || name === "DevicesNotFoundError") {
+        return "مش لاقي مايكروفون متاح على الجهاز. اتأكد إن مفيش سماعة أو جهاز تاني واخد المايك، وحاول تاني.";
+      }
+      if (name === "NotReadableError" || name === "TrackStartError") {
+        return "المايك مشغول أو مش قادر يفتح — ممكن تطبيق تاني بيستخدمه دلوقتي. اقفله وحاول تاني.";
+      }
+      if (name === "AbortError") {
+        return "طلب المايك اتلغى قبل ما يكمّل. دوس «ابدأ الاستماع» وحاول تاني.";
+      }
+      return "حصلت مشكلة في فتح المايك. اتأكد إنك فاتح الصفحة في Safari وإن إذن المايك مسموح، وحاول تاني — صوتك بيتحلّل على جهازك ومش بيتبعت لأي مكان.";
+    }
+
+    function requestMicStream() {
+      var md = navigator.mediaDevices;
+      if (!md || typeof md.getUserMedia !== "function") {
+        return Promise.reject(new Error("mic-unavailable"));
+      }
+      var timedOut = false;
+      var attempt = (async function() {
+        try {
+          return await md.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+        } catch (e) {
+          if (e && (e.name === "OverconstrainedError" || e.name === "TypeError")) {
+            return await md.getUserMedia({ audio: true });
+          }
+          throw e;
+        }
+      })();
+      var timeout = new Promise(function(_, reject) {
+        setTimeout(function() { timedOut = true; reject(new Error("mic-timeout")); }, 10000);
+      });
+      return Promise.race([attempt, timeout]).catch(function(e) {
+        if (timedOut) {
+          attempt.then(function(s) { s.getTracks().forEach(function(t) { t.stop(); }); }).catch(function(){});
+        }
+        throw e;
+      });
+    }
+
+    function currentTarget() { return coach.targets[coach.index] || null; }
+
+    function coachLoop() {
+      if (!coach.listening || !coach.analyser || !coach.ac) return;
+      var ac = coach.ac, analyser = coach.analyser;
+      var buf = new Float32Array(analyser.fftSize);
+      analyser.getFloatTimeDomainData(buf);
+      var rms = 0, i;
+      for (i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
+      rms = Math.sqrt(rms / buf.length);
+      coach.level = rms;
+      levelFill.style.width = Math.min(100, Math.round(rms * 400)) + "%";
+      levelFill.style.background = rms >= 0.015 ? "#4caf7d" : "#7a6a4f";
+      if (rms >= 0.015) {
+        coach.heard = true;
+        levelText.textContent = "المايك سامع صوت دلوقتي 🔊 — المؤشر ده بيتحرك مع عزفك";
+        noSoundNote.classList.add("hidden");
+      } else {
+        levelText.textContent = "المايك مفتوح بس مش سامع صوت لسه — اعزف نغمة وشوف المؤشر بيتحرك ولا لأ";
+        if (!coach.heard && performance.now() - coach.startedAt > 5000) {
+          noSoundNote.textContent = "عدّت ٥ ثواني والمايك مش سامع أي حاجة: قرّب الموبايل من البيانو واعزف أقوى، وشيل أي سماعة بلوتوث متوصلة — ممكن تكون واخدة المايك والصوت.";
+          noSoundNote.classList.remove("hidden");
+        }
+      }
+
+      var f = autoCorrelate(buf, ac.sampleRate);
+      if (f > 0) {
+        var rawMidi = 69 + 12 * Math.log2(f / 440);
+        var stable = coach.smoother.push(rawMidi);
+        if (stable != null) {
+          coach.detected = stable;
+          coach.freq = freqOf(stable);
+          judgeNote(stable);
+        }
+      } else {
+        coach.smoother.push(null);
+        coach.detected = null;
+        coach.freq = null;
+        coach.holdSince = null;
+      }
+      renderCoach();
+      coach.raf = requestAnimationFrame(coachLoop);
+    }
+
+    function judgeNote(midi) {
+      var t = currentTarget();
+      if (!t || coach.finished) return;
+      var folded = foldToTarget(midi, t.midi);
+      var cents = (folded - t.midi) * 100;
+      var nearestQuarter = Math.round(folded * 2) / 2;
+      var inTune = Math.abs(cents) <= 25;
+      var sameNote = Math.abs(nearestQuarter - t.midi) < 0.01;
+      var now = performance.now();
+      if (inTune) {
+        coach.wrongSince = null;
+        coach.countedWrong = false;
+        if (coach.holdSince == null) coach.holdSince = now;
+        if (now - coach.holdSince >= 420) {
+          coach.holdSince = null;
+          coach.hits += 1;
+          playTone(t.midi, 0.35, 0, 0.12);
+          var next = coach.index + 1;
+          coach.smoother.reset();
+          if (next >= coach.targets.length) {
+            coach.finished = true;
+            coach.index = coach.targets.length;
+          } else {
+            coach.index = next;
+          }
+        }
+      } else {
+        coach.holdSince = null;
+        if (!sameNote) {
+          if (coach.wrongSince == null) coach.wrongSince = now;
+          if (now - coach.wrongSince > 900 && !coach.countedWrong) {
+            coach.countedWrong = true;
+            coach.misses += 1;
+          }
+        } else {
+          coach.wrongSince = null;
+        }
+      }
+    }
+
+    function stopCoach() {
+      cancelAnimationFrame(coach.raf);
+      if (coach.stream) coach.stream.getTracks().forEach(function(t) { t.stop(); });
+      coach.stream = null;
+      coach.listening = false;
+      coach.detected = null; coach.freq = null; coach.level = 0;
+      coach.smoother.reset();
+      liveUi.classList.add("hidden");
+      micBtn.textContent = "🎤 ابدأ الاستماع";
+      micBtn.className = "btn-accent";
+      setMicStatus("idle", "المايك واقف");
+      renderCoach();
+    }
+
+    function startCoach() {
+      showMicError(null);
+      if (!window.isSecureContext || !navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== "function") {
+        setMicStatus("err", "المايك الحي غير مدعوم هنا");
+        showMicError(micErrorMessage(new Error("mic-unavailable")));
+        document.getElementById("safari-banner").scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      coach.starting = true;
+      micBtn.disabled = true;
+      micBtn.textContent = "⏳ بيطلب إذن المايك…";
+      setMicStatus("idle", "بيطلب إذن المايك…");
+      requestMicStream().then(function(stream) {
+        coach.stream = stream;
+        var ac = getAudio();
+        return ac.resume().catch(function(){}).then(function() { return ac; });
+      }).then(function(ac) {
+        coach.ac = ac;
+        var source = ac.createMediaStreamSource(coach.stream);
+        var analyser = ac.createAnalyser();
+        analyser.fftSize = 2048;
+        source.connect(analyser);
+        coach.analyser = analyser;
+        coach.listening = true;
+        coach.heard = false;
+        coach.startedAt = performance.now();
+        coach.smoother.reset();
+        liveUi.classList.remove("hidden");
+        noSoundNote.classList.add("hidden");
+        micBtn.disabled = false;
+        micBtn.textContent = "⏹ إيقاف";
+        micBtn.className = "btn-stop";
+        setMicStatus("live", "🎙 بيسمع دلوقتي — لايف");
+        renderCoach();
+        coach.raf = requestAnimationFrame(coachLoop);
+      }).catch(function(e) {
+        if (coach.stream) coach.stream.getTracks().forEach(function(t) { t.stop(); });
+        coach.stream = null;
+        coach.listening = false;
+        micBtn.disabled = false;
+        micBtn.textContent = "🎤 ابدأ الاستماع";
+        micBtn.className = "btn-accent";
+        setMicStatus("err", "المايك مافتحش");
+        showMicError(micErrorMessage(e));
+      }).then(function() { coach.starting = false; });
+    }
+
+    micBtn.addEventListener("click", function() {
+      unlockAudio();
+      if (coach.listening) stopCoach();
+      else if (!coach.starting) startCoach();
+    });
+
+    /* صوت تجريبي: يشغّل النغمة المطلوبة من السماعة والمايك يلقطها */
+    el("btn-test-tone").addEventListener("click", function() {
+      unlockAudio();
+      var t = currentTarget();
+      var midi = t ? t.midi : 60;
+      function fire() { playTone(midi, 1.4, 0, 0.3); }
+      if (!coach.listening && !coach.starting) {
+        startCoach();
+        setTimeout(fire, 900);
+      } else {
+        fire();
+      }
+    });
+
+    el("btn-hear-target").addEventListener("click", function() {
+      unlockAudio();
+      var t = currentTarget();
+      if (!t) return;
+      /* في وضع الغنا، النغمة المطلوبة بتتغنّى بصوت بشري مش بتتعزف */
+      if (coach.voice) playVoice(t.midi, 1.1);
+      else playTone(t.midi, 0.9);
+    });
+    el("btn-skip").addEventListener("click", function() {
+      coach.holdSince = null;
+      coach.smoother.reset();
+      var next = coach.index + 1;
+      if (next >= coach.targets.length) { coach.finished = true; coach.index = coach.targets.length; }
+      else coach.index = next;
+      renderCoach();
+    });
+    function resetExercise() {
+      coach.index = 0; coach.hits = 0; coach.misses = 0; coach.finished = false;
+      coach.holdSince = null; coach.wrongSince = null; coach.countedWrong = false;
+      coach.smoother.reset();
+      renderCoach();
+    }
+    el("btn-restart").addEventListener("click", resetExercise);
+    el("btn-restart-done").addEventListener("click", resetExercise);
+
+    function setCoachConfig(cfg) {
+      coach.title = cfg.title;
+      coach.targets = cfg.targets || [];
+      coach.freeScale = cfg.freeScale || null;
+      coach.voice = !!cfg.voice;
+      resetExercise();
+      showTab("coach");
+      el("coach-card").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    var VERDICTS = {
+      correct: { bg: "#1e4634", text: "#7fe0ae", label: "صح! النغمة مظبوطة" },
+      sharp:   { bg: "#4d3a10", text: "#ffd166", label: "حاد — أعلى من المطلوب" },
+      flat:    { bg: "#4d3a10", text: "#ffd166", label: "خافت — أوطى من المطلوب" },
+      wrong:   { bg: "#55201a", text: "#ff9d8f", label: "نغمة غلط" },
+      silent:  { bg: "#2a2016", text: "#b8a888", label: "غنّي أو اعزف نغمة…" }
+    };
+
+    function renderCoach() {
+      el("coach-title").textContent = coach.title;
+      var sequenceMode = coach.targets.length > 0;
+      var target = currentTarget();
+
+      /* رقائق التقدم */
+      var chips = el("target-chips");
+      chips.innerHTML = "";
+      coach.targets.forEach(function(t, i) {
+        var s = document.createElement("span");
+        s.className = "target-chip" + (coach.finished || i < coach.index ? " done" : i === coach.index ? " now" : "");
+        s.textContent = t.label;
+        chips.appendChild(s);
+      });
+      el("targets-ui").style.display = sequenceMode ? "" : "none";
+      el("score-line").textContent = sequenceMode ? ("نغمات صح: " + coach.hits + " · محاولات غلط: " + coach.misses) : "";
+
+      el("finished-box").classList.toggle("hidden", !coach.finished);
+      el("live-box").classList.toggle("hidden", coach.finished);
+      if (coach.finished) {
+        el("finished-detail").textContent = "محاولات غلط أثناء التمرين: " + coach.misses + ". كل ما الرقم ده يقل، أذنك بتتظبط أكتر.";
+      }
+
+      el("target-name").textContent = target ? target.label : "أي نغمة";
+      el("btn-hear-target").style.display = target ? "" : "none";
+      el("btn-hear-target").textContent = coach.voice ? "🗣️ اسمعها متغنّية" : "🔊 اسمعها";
+      el("seq-controls").style.display = sequenceMode && target ? "" : "none";
+      el("gauge-ui").style.display = sequenceMode ? "" : "none";
+      el("target-freq-line").textContent = target ? ("التردد المستهدف: " + Math.round(freqOf(target.midi)) + " هرتز") : "";
+
+      /* الحكم */
+      var verdict = "silent", cents = 0, detectedName = "—";
+      if (coach.detected != null && target) {
+        var folded = foldToTarget(coach.detected, target.midi);
+        cents = Math.round((folded - target.midi) * 100);
+        detectedName = englishNoteName(folded);
+        var nq = Math.round(folded * 2) / 2;
+        if (Math.abs(cents) <= 25) verdict = "correct";
+        else if (Math.abs(nq - target.midi) < 0.01) verdict = cents > 0 ? "sharp" : "flat";
+        else verdict = "wrong";
+      }
+      el("detected-name").textContent = coach.detected != null
+        ? (sequenceMode ? detectedName : englishNoteName(coach.detected))
+        : "—";
+      el("detected-freq").textContent = coach.freq ? Math.round(coach.freq) + " هرتز" : "مفيش صوت";
+
+      var box = el("verdict-box"), label = el("verdict-label"), detail = el("verdict-detail");
+      if (!sequenceMode) {
+        box.style.background = "var(--idle-bg)";
+        label.style.color = "var(--idle)";
+        if (!coach.listening) { label.textContent = "المايك واقف"; detail.textContent = ""; }
+        else if (coach.detected == null) { label.textContent = "غنّي أو اعزف نغمة…"; detail.textContent = ""; }
+        else if (coach.freeScale) {
+          var fs = coach.freeScale;
+          var rel = ((coach.detected - fs.tonicMidi) % 12 + 12) % 12;
+          var nearest = fs.semis[0];
+          fs.semis.forEach(function(s) { if (Math.abs(s - rel) < Math.abs(nearest - rel)) nearest = s; });
+          var diff = Math.round((rel - nearest) * 100);
+          if (Math.abs(diff) <= 30) {
+            box.style.background = "#1e4634"; label.style.color = "#7fe0ae";
+            label.textContent = "نغمة من سلم " + fs.name + " — قريبة من «" + englishNoteName(fs.tonicMidi + nearest) + "»";
+          } else {
+            box.style.background = "#55201a"; label.style.color = "#ff9d8f";
+            label.textContent = "دي مش من سلم " + fs.name + " — أقرب نغمة من السلم: «" + englishNoteName(fs.tonicMidi + nearest) + "»";
+          }
+          detail.textContent = "";
+          detail.style.color = label.style.color;
+        } else {
+          label.textContent = englishNoteName(coach.detected);
+          detail.textContent = "";
+        }
+      } else {
+        var vs = VERDICTS[verdict];
+        if (!coach.listening && coach.detected == null) {
+          vs = { bg: "#2a2016", text: "#b8a888", label: "المايك واقف" };
+        }
+        box.style.background = vs.bg;
+        label.style.color = vs.text;
+        label.textContent = vs.label;
+        detail.style.color = vs.text;
+        if (!target) detail.textContent = "";
+        else if (verdict === "correct") detail.textContent = "ثبّت كده لحظة وهنعدّي للنغمة اللي بعدها.";
+        else if (verdict === "sharp") detail.textContent = "انت أعلى بـ" + Math.abs(cents) + " سنت. نزّل صوتك سنة صغيرة — قرّب من «" + target.label + "».";
+        else if (verdict === "flat") detail.textContent = "انت أوطى بـ" + Math.abs(cents) + " سنت. علّي صوتك سنة صغيرة — قرّب من «" + target.label + "».";
+        else if (verdict === "wrong") detail.textContent = "المطلوب «" + target.label + "» وانت جبت «" + detectedName + "». اسمع المطلوبة وقلّدها.";
+        else detail.textContent = "المطلوب دلوقتي: «" + target.label + "». اسمعها الأول لو حابب، وبعدين غنّيها أو اعزفها قدام المايك.";
+      }
+
+      /* مقياس السنت */
+      var pct = Math.max(-50, Math.min(50, cents)) + 50;
+      var ball = el("gauge-ball");
+      ball.style.left = "calc(" + pct + "% - 8px)";
+      ball.style.background = verdict === "correct" ? "#4caf7d" : verdict === "wrong" ? "#e05d4d" : "#ffd166";
+      el("cents-label").textContent = (cents > 0 ? "+" + cents : cents) + " سنت";
+    }
+
+    /* منتقي التمارين داخل المدرب */
+    (function buildExercisePicker() {
+      var picker = el("exercise-picker");
+      MAQAMAT.forEach(function(m) {
+        var b1 = document.createElement("button");
+        b1.type = "button"; b1.className = "chip-btn";
+        b1.textContent = "سلّم " + m.name;
+        b1.setAttribute("aria-label", "اتدرب بالمايك على سلم مقام " + m.name);
+        b1.addEventListener("click", function() {
+          setCoachConfig({ title: "تدريب مايك: سلم " + m.name + " صعودًا ونزولًا", targets: scaleTargets(m, true) });
+        });
+        picker.appendChild(b1);
+        var b2 = document.createElement("button");
+        b2.type = "button"; b2.className = "chip-btn";
+        b2.textContent = "حر على " + m.name;
+        b2.setAttribute("aria-label", "تدريب حر بالمايك على مقام " + m.name);
+        b2.addEventListener("click", function() {
+          setCoachConfig({ title: "تدريب حر على مقام " + m.name, targets: [], freeScale: { name: m.name, tonicMidi: m.tonicMidi, semis: m.notes.map(function(n) { return n[1]; }) } });
+        });
+        picker.appendChild(b2);
+      });
+    })();
+
+    /* زرار فتح Safari: يبرز خطوات الفتح والتثبيت */
+    el("btn-open-safari").addEventListener("click", function() {
+      var steps = el("safari-steps");
+      steps.scrollIntoView({ behavior: "smooth", block: "center" });
+      steps.style.transition = "background .3s";
+      steps.style.background = "var(--surface-alt)";
+      steps.style.borderRadius = ".75rem";
+      steps.style.padding = ".5rem .75rem";
+      setTimeout(function() { steps.style.background = "transparent"; }, 1600);
+    });
+
+    window.addEventListener("pagehide", function() { if (coach.listening) stopCoach(); });
+    renderCoach();
+    </script>
+
+    <script>
+    "use strict";
+    /* ════════════════ قاموس المصطلحات — شرح بسيط بالمصري ════════════════ */
+    var GLOSSARY = [
+      { term: "الركوز (التونيك)",
+        simple: "هي النغمة الأساسية اللي المقام كله مبني عليها، وبيحسسك إنك «وصلت البيت» لما اللحن يقف عليها. زي عنوان البيت بالظبط: كل النغمات بتخرج منها وبترجعلها.",
+        why: "لو عرفت الركوز، عرفت تبدأ منين وتقفل فين، وأي نغمة برّه المقام هتحس بيها على طول.",
+        example: "ركوز مقام الراست هو C: السلم بيبدأ C وبيقفل C. وركوز البياتي D، وركوز السيكاه E half-flat." },
+      { term: "الدرجة",
+        simple: "كل نغمة في السلم ليها رقم حسب ترتيبها: الأولى، التانية، التالتة… لحد التامنة. الرقم ده اسمه «الدرجة».",
+        why: "المدرّبين بيكلموا بالأرقام: «اقف على الخامسة» معناها النغمة رقم ٥ في السلم، فلو عارف درجاتك هتفهم أي شرح بسرعة.",
+        example: "في راست على C: الدرجة الأولى C، التانية D، التالتة E half-flat، الخامسة G، والتامنة C العالية." },
+      { term: "جنس الأصل",
+        simple: "المقام متقسم حتتين، وكل حتة اسمها «جنس». جنس الأصل هو الحتة اللي تحت: أول ٤ نغمات من السلم، وده اللي بيحدد شخصية المقام الأساسية.",
+        why: "نص المقام بيتعرف من جنس أصله؛ لو ظبطت أول ٤ نغمات، انت مسكت أهم حتة في المقام.",
+        example: "جنس أصل الراست: C – D – E half-flat – F. وجنس أصل الحجاز: D – E♭ – F♯ – G، وفيه القفزة الشهيرة بين E♭ وF♯." },
+      { term: "جنس الفرع",
+        simple: "هو الحتة اللي فوق من المقام: النغمات اللي بعد جنس الأصل لحد آخر السلم. غالبًا بيبدأ من الدرجة الخامسة (الغماز).",
+        why: "الفرع هو اللي بيفرّق بين مقامات شبه بعض في أصلها؛ نفس الأصل مع فرع مختلف يديك مقام تاني خالص.",
+        example: "جنس فرع الراست: G – A – B half-flat – C. وفرع البياتي جنس نهاوند على G: ‏G – A – B♭ – C." },
+      { term: "الأجناس (بشكل عام)",
+        simple: "المقام مش ٨ نغمات وخلاص؛ هو جنسين راكبين على بعض: جنس أصل تحت وجنس فرع فوق. كل جنس ٣ أو ٤ أو ٥ نغمات وله طابع لوحده.",
+        why: "لو حفظت المقامات كأجناس مش كنغمات مفككة، هتحفظ أسرع وهتقدر تنقل نفس الجنس لمقام تاني وتبني مقامات بنفسك.",
+        example: "جنس الحجاز (D – E♭ – F♯ – G) بيظهر أصلًا في مقام الحجاز، وفرعًا في النهاوند على G — عشان كده النهاوند فيه لمحة حجازية." },
+      { term: "الغماز",
+        simple: "هي الدرجة اللي اللحن بيقف عليها وقفة مؤقتة في نص الجملة قبل ما يكمل أو يقفل — غالبًا الدرجة الخامسة. زي محطة استراحة في الطريق مش نهاية المشوار.",
+        why: "الوقوف على الغماز بيشدّ ودن السامع وبيخليه مستني القفلة؛ أغلب جُمَل المقام بتلف حوالين الركوز والغماز.",
+        example: "غماز الراست هو G (الدرجة الخامسة): اللحن يطلع يقف على G شوية وبعدين ينزل يقفل على C." },
+      { term: "السير اللحني",
+        simple: "هو «الطريق المعتاد» اللي لحن المقام بيمشي فيه: بيبدأ منين، بيطلع ولا بينزل الأول، بيقف فين. كل مقام له سير شبه العادة.",
+        why: "اتنين بيغنوا نفس السلم ممكن واحد يبان أصيل والتاني لأ؛ الفرق هو السير. لو مشيت بسير المقام، غناك هيبان «من المقام» فعلًا.",
+        example: "الراست بيحب يبدأ من الجواب (C العالية) وينزل للقرار. والبياتي بيدور حوالين D وE half-flat في الوسط قبل ما يقفل." },
+      { term: "القفلة",
+        simple: "هي نهاية الجملة الموسيقية: آخر كام نغمة بيرجعوا بيك للركوز وبيحسسوك إن الكلام خلص. زي النقطة في آخر الجملة.",
+        why: "القفلة المظبوطة هي اللي بتخلي السامع يحس بالراحة والاكتمال؛ قفلة غلط أو على نغمة غلط بتخلي الجملة «معلّقة».",
+        example: "قفلة راست مشهورة: C العالية – B half-flat – A – G – F – E half-flat – D – C، وآخر C دي هي النقطة." },
+      { term: "الربع تون",
+        simple: "المسافة بين أي نغمتين جيران في البيانو العادي اسمها «نص تون». الربع تون هو نص النص ده: نغمة في النص بالظبط بين نغمتين. البيانو العادي مفيهوش ربع تون، بس صوتك بيقدر يجيبه.",
+        why: "الربع تون هو روح المقامات الشرقية؛ من غيره الراست والبياتي والصبا بيبقوا نسخ باهتة من نفسهم.",
+        example: "E half-flat نغمة في النص بين E♭ وE بالظبط. هي نجمة الراست والبياتي، وركوز السيكاه نفسه E half-flat." },
+      { term: "السنت (Cent)",
+        simple: "وحدة قياس صغيّرة للفرق بين نغمتك والنغمة الصح. المسافة بين أي نغمتين جيران (نص تون) = ١٠٠ سنت، والربع تون = ٥٠ سنت.",
+        why: "المدرب بيقيس غلطك بالسنت عشان يقولك انت قريب قد إيه: فرق أقل من ٢٥ سنت يعني انت صح عمليًا.",
+        example: "لو المطلوب E half-flat وانت غنيت أعلى بـ٢٠ سنت، انت صح. لو أعلى بـ٦٠ سنت، انت حاد وعدّيت الربع تون نفسه." },
+      { term: "حاد وخافت (Sharp / Flat)",
+        simple: "«حاد» معناها صوتك أعلى من النغمة الصح، و«خافت» معناها أوطى منها. مش معناها صوتك وحش — معناها سنة صغيّرة فوق أو تحت المطلوب.",
+        why: "أغلب غلط الغنا مش نغمة غلط خالص، لكن حاد أو خافت بكام سنت؛ ودي بتتظبط بسرعة لو عرفت الاتجاه والمقدار.",
+        example: "المطلوب G وانت جبتها أعلى بـ٣٠ سنت: انت حاد، نزّل سنة. جبتها أوطى بـ٤٠ سنت: انت خافت، علّي سنة." },
+      { term: "العُرب",
+        simple: "هي الزخارف الصوتية الصغيرة اللي بتجمّل النغمة: تريل سريع (تهزيز النغمة مع اللي جنبها)، زحلقة (تنزلق من نغمة لنغمة)، غمزة (تكرار خفيف). زي التوابل في الأكل.",
+        why: "الغنا الشرقي من غير عُرب بيبقى ناشف ومدرسي؛ العُرب هي اللي بتحوّل النغمات الصح لطرب حقيقي.",
+        example: "قبل قفلة الحجاز، اعمل تريل سريع على F♯ مع G ورجع — دي عُربة بسيطة بتفرق جدًا في الإحساس." },
+      { term: "القرار والجواب",
+        simple: "القرار هو منطقة النغمات الواطية حوالين الركوز من تحت، والجواب هو نفس النغمات بس أعلى بأوكتاف (أعلى بضعف التردد). اللحن بينزل للقرار يرتاح، ويطلع للجواب يتشوّق.",
+        why: "لما تفهم القرار والجواب هتفهم ليه المغني بيبدأ عالي وينزل، أو يبني الجملة من تحت لفوق قبل القفلة.",
+        example: "في الراست: C اللي تحت قرار، وC اللي فوقها بأوكتاف جواب — نفس النغمة بس أعلى." },
+      { term: "الكورد والأربيجو",
+        simple: "الكورد هو ٣ نغمات أو أكتر بيتعزفوا مع بعض في نفس اللحظة (زي Am = ‏A – C – E). الأربيجو هو نفس نغمات الكورد بس بيتعزفوا واحدة ورا التانية بسرعة.",
+        why: "الكوردات هي المصاحبة اللي الغنا بيقف عليها؛ والأربيجو أسلوب أخف لعزف نفس الكورد لما الغنا يهدا.",
+        example: "كورد Am نغماته A وC وE: دوسهم مع بعض يبقى كورد، دوسهم ورا بعض يبقى أربيجو." }
+    ];
+
+    function renderGlossary(container) {
+      container.innerHTML = "";
+      var head = document.createElement("div");
+      head.innerHTML = "<h2 class='font-display' style='font-size:1.3rem'>📖 المصطلحات الصعبة؟ شرحها بكلام بسيط</h2>" +
+        "<p class='small dim' style='margin:.3rem 0 0'>كل كلمة هتقابلك وانت بتتعلم المقامات، مشروحة بالمصري وبمثال بنغمات إنجليزي A–G. دوس على أي مصطلح عشان يفتح شرحه.</p>";
+      container.appendChild(head);
+      GLOSSARY.forEach(function(g) {
+        var d = document.createElement("details");
+        d.style.cssText = "border:1px solid var(--border);border-radius:.75rem;padding:.6rem .8rem;margin-top:.5rem;background:var(--surface-alt)";
+        var s = document.createElement("summary");
+        s.style.cssText = "font-weight:700;min-height:2.25rem;display:flex;align-items:center;cursor:pointer";
+        s.textContent = g.term;
+        d.appendChild(s);
+        var body = document.createElement("div");
+        body.innerHTML =
+          "<p style='margin:.4rem 0 0'><strong>يعني إيه؟</strong> " + esc(g.simple) + "</p>" +
+          "<p style='margin:.4rem 0 0'><strong>ليه مهم؟</strong> " + esc(g.why) + "</p>" +
+          "<p style='margin:.4rem 0 0'><strong>مثال:</strong> " + esc(g.example) + "</p>";
+        d.appendChild(body);
+        container.appendChild(d);
+      });
+    }
+
+    /* ════════════════ قسم المقامات ════════════════ */
+    var selectedMaqamId = "rast";
+    var maqamPiano = null, maqamChips = null, maqamSeq = null;
+
+    function renderMaqamPicker() {
+      var picker = el("maqam-picker");
+      picker.innerHTML = "";
+      MAQAMAT.forEach(function(m) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "pill-btn" + (m.id === selectedMaqamId ? " on" : "");
+        b.textContent = m.name;
+        b.setAttribute("aria-label", "مقام " + m.name);
+        b.setAttribute("aria-pressed", m.id === selectedMaqamId ? "true" : "false");
+        b.addEventListener("click", function() { selectedMaqamId = m.id; renderMaqamPicker(); renderMaqamDetail(); });
+        picker.appendChild(b);
+      });
+    }
+
+    function renderMaqamDetail() {
+      var m = maqamById(selectedMaqamId);
+      var box = el("maqam-detail");
+      var midis = m.notes.map(function(n) { return m.tonicMidi + n[1]; });
+      var rootJinsNotes = m.notes.slice(0, 4).map(function(n) { return n[0]; }).join(" – ");
+      var branchJinsNotes = m.notes.slice(4).map(function(n) { return n[0]; }).join(" – ");
+      var ghamaz = m.notes[4] ? m.notes[4][0] : m.tonicName;
+
+      box.innerHTML =
+        "<article class='card'>" +
+          "<div class='row-between'><h2 class='font-display' style='font-size:1.6rem'>مقام " + esc(m.name) + "</h2>" +
+          "<span class='small dim'>الركوز: " + esc(m.tonicName) + "</span></div>" +
+          "<p style='margin:.3rem 0 0;font-weight:600;color:var(--accent)'>" + esc(m.mood) + "</p>" +
+          "<p style='margin:.4rem 0 0'>" + esc(m.character) + "</p>" +
+
+          "<div class='alt-box' style='margin-top:.8rem'><p style='margin:0'><strong>يعني إيه ركوز؟</strong> " +
+          "الركوز هو النغمة «البيت» بتاعة المقام: السلم بيبدأ منها واللحن بيقفل عليها ويرتاح. ركوز مقام " + esc(m.name) + " هو <strong>" + esc(m.tonicName) + "</strong> — " +
+          "دوس عليها تحت واسمع إحساس «الوصول». شرح أوسع في قاموس المصطلحات تحت.</p></div>" +
+
+          "<h3 style='margin-top:1rem'>السلم — دوس على أي نغمة عشان تسمعها</h3>" +
+          "<div id='mq-chips' style='margin-top:.5rem'></div>" +
+          "<div class='row' style='margin-top:.7rem'>" +
+            "<button type='button' class='btn-accent' id='mq-play-up'>▶ اسمع الصعود</button>" +
+            "<button type='button' class='btn-ghost' id='mq-play-down'>▶ اسمع النزول</button>" +
+            "<button type='button' class='btn-accent-outline' id='mq-coach'>🎤 اتدرّب عليه بالمايك</button>" +
+            "<button type='button' class='btn-ghost' id='mq-cr'>🗣️ غنّي ورايا</button>" +
+          "</div>" +
+          "<div id='mq-piano' style='margin-top:.8rem'></div>" +
+          "<p class='tiny dim' style='margin:.3rem 0 0'>النغمات المظللة هي درجات المقام؛ علامة ¼ معناها ربع تون — البيانو العادي بيقرّبها، لكن صوت التشغيل هنا والمايك بيحسبوها بدقتها الحقيقية. تشغيل البيانو ده للعزف ودروس البيانو — أما سماع السلّم بصوت بشري فهو الفيديو اللي تحته على طول.</p>" +
+
+          humanScaleCardHtml(m, "h3") +
+
+          "<div style='display:grid;gap:.75rem;margin-top:1rem' class='mq-grid'>" +
+            "<div class='alt-box'><h3>الأجناس — المقام حتتين راكبين على بعض</h3>" +
+              "<p class='small' style='margin:.4rem 0 0'><strong>جنس الأصل</strong> (الحتة اللي تحت، أول ٤ نغمات): " + esc(m.jins[0]) + " = <strong>" + esc(rootJinsNotes) + "</strong>. ده اللي بيدّي المقام شخصيته الأساسية.</p>" +
+              "<p class='small' style='margin:.4rem 0 0'><strong>جنس الفرع</strong> (الحتة اللي فوق): " + esc(m.jins[1]) + " = <strong>" + esc(branchJinsNotes) + "</strong>.</p>" +
+              "<p class='small' style='margin:.4rem 0 0'><strong>الغماز</strong> — محطة الوقوف المؤقت في نص الجملة — هو هنا <strong>" + esc(ghamaz) + "</strong> (الدرجة الخامسة غالبًا).</p>" +
+              "<h3 style='margin-top:.8rem'>السير اللحني</h3>" +
+              "<p class='small' style='margin:.3rem 0 0'>السير هو الطريق المعتاد للّحن جوه المقام. في " + esc(m.name) + ": " + esc(m.sayr) + "</p></div>" +
+            "<div class='alt-box'><h3>من أشهر ما اتغنى عليه</h3><ul class='plain'>" +
+              m.famous.map(function(f) { return "<li>" + esc(f) + "</li>"; }).join("") + "</ul></div>" +
+          "</div>" +
+
+          (DAGHER_BY_MAQAM[m.id] ?
+            "<div class='alt-box' style='margin-top:1rem;border:1px solid var(--accent)'><h3>🎻 اسمع المقام من أستاذ — عبده داغر</h3>" +
+            "<p class='small dim' style='margin:.35rem 0 0'>عبده داغر <strong>عازف كمان</strong> — «ملك التقاسيم» — مش مغنّي، فمفيش هنا غنا بصوت بشري. قيمة التقاسيم دي لودنك: بتسمع شخصية مقام " + esc(m.name) + " الحقيقية، سيره اللحني، تنقّلاته بين جنس الأصل والفرع، وقفلته على الركوز " + esc(m.tonicName) + " — على كمان أستاذ. الفيديوهات بتشتغل من مشغّل يوتيوب الرسمي.</p>" +
+            DAGHER_BY_MAQAM[m.id].map(function(v) { return dagherVideoHtml(v); }).join("") + "</div>" : "") +
+
+          "<h3 style='margin-top:1.1rem'>جُمَل صولو للتدريب</h3>" +
+          "<div id='mq-phrases'></div>" +
+        "</article>";
+
+      bindYtFacades(box);
+      maqamChips = noteChips(el("mq-chips"), m.notes.map(function(n) { return { label: n[0], semi: n[1] }; }), m.tonicMidi);
+      maqamPiano = buildPiano(el("mq-piano"), { low: 48, high: 76 });
+      maqamPiano.setHighlights(midis);
+      maqamSeq = makeSequencer(function(mm, idx) {
+        maqamPiano.setActive(mm);
+        if (maqamChips) maqamChips.setActiveIdx(idx >= 0 ? idx : null);
+      });
+
+      el("mq-play-up").addEventListener("click", function() { unlockAudio(); maqamSeq.play(midis, 460); });
+      el("mq-play-down").addEventListener("click", function() { unlockAudio(); maqamSeq.play(midis.slice().reverse(), 460); });
+      el("mq-coach").addEventListener("click", function() {
+        setCoachConfig({ title: "تدريب مايك: سلم " + m.name + " صعودًا ونزولًا", targets: scaleTargets(m, true) });
+      });
+      el("mq-cr").addEventListener("click", function() { startCallResponse(m.id, "scale", 0); });
+
+      var ph = el("mq-phrases");
+      m.phrases.forEach(function(p, pi) {
+        var card = document.createElement("div");
+        card.style.cssText = "border:1px solid var(--border);border-radius:.75rem;padding:.75rem;margin-top:.6rem";
+        card.innerHTML =
+          "<div class='row-between'><p style='margin:0;font-weight:600'>" + esc(p.title) + "</p>" +
+          "<span class='row'>" +
+            "<button type='button' class='chip-btn' data-act='play'>▶ اسمعها</button>" +
+            "<button type='button' class='chip-btn' data-act='coach'>🎤 بالمايك</button>" +
+            "<button type='button' class='chip-btn' data-act='cr'>🗣️ غنّي ورايا</button>" +
+          "</span></div>" +
+          "<p class='small dim' style='margin:.3rem 0 0'>" + esc(p.tip) + "</p>";
+        card.querySelector("[data-act='play']").addEventListener("click", function() {
+          unlockAudio();
+          maqamSeq.play(p.notes.map(function(s) { return m.tonicMidi + s; }), 400);
+        });
+        card.querySelector("[data-act='coach']").addEventListener("click", function() {
+          setCoachConfig({ title: "تدريب مايك: " + p.title + " (" + m.name + ")", targets: phraseTargets(m, p) });
+        });
+        card.querySelector("[data-act='cr']").addEventListener("click", function() { startCallResponse(m.id, "phrase", pi); });
+        ph.appendChild(card);
+      });
+    }
+
+    /* تدريب الأذن */
+    var quizPool = MAQAMAT.filter(function(m) { return ["rast","bayati","hijaz","nahawand","kurd","saba"].indexOf(m.id) >= 0; });
+    var quiz = { target: null, options: [], picked: null, correct: 0, total: 0 };
+    var quizSeq = null;
+    function pickQuizRound() {
+      var target = quizPool[Math.floor(Math.random() * quizPool.length)];
+      var others = quizPool.filter(function(m) { return m.id !== target.id; })
+        .sort(function() { return Math.random() - 0.5; }).slice(0, 3);
+      quiz.target = target;
+      quiz.options = others.concat([target]).sort(function() { return Math.random() - 0.5; });
+      quiz.picked = null;
+    }
+    function renderQuiz() {
+      var box = el("ear-quiz");
+      box.innerHTML =
+        "<div class='row-between'><h2 class='font-display' style='font-size:1.3rem'>تدريب الأذن: ده مقام إيه؟</h2>" +
+        "<span class='small dim'>نتيجتك: " + quiz.correct + " / " + quiz.total + "</span></div>" +
+        "<p class='small dim' style='margin:.3rem 0 0'>اسمع السلم صعودًا ونزولًا وخمّن المقام. أذنك هي أهم أداة عندك — وده تدريبها المباشر.</p>" +
+        "<button type='button' class='btn-accent' id='q-play' style='margin-top:.7rem'>▶ اسمع المقام</button>" +
+        "<div id='q-opts' style='display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.7rem'></div>" +
+        "<div id='q-result' style='margin-top:.7rem'></div>";
+      quizSeq = makeSequencer(function() {});
+      el("q-play").addEventListener("click", function() {
+        unlockAudio();
+        var midis = quiz.target.notes.map(function(n) { return quiz.target.tonicMidi + n[1]; });
+        quizSeq.play(midis.concat(midis.slice().reverse().slice(1)), 400);
+      });
+      var opts = el("q-opts");
+      quiz.options.forEach(function(m) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "btn-ghost";
+        b.style.minHeight = "3rem";
+        b.textContent = m.name;
+        b.setAttribute("aria-label", "تخمين مقام " + m.name);
+        if (quiz.picked) {
+          if (m.id === quiz.target.id) { b.style.background = "#1e4634"; b.style.color = "#7fe0ae"; b.style.borderColor = "#1e4634"; }
+          else if (m.id === quiz.picked) { b.style.background = "#55201a"; b.style.color = "#ff9d8f"; b.style.borderColor = "#55201a"; }
+        }
+        b.addEventListener("click", function() {
+          if (quiz.picked) return;
+          quiz.picked = m.id;
+          quiz.total += 1;
+          if (m.id === quiz.target.id) quiz.correct += 1;
+          renderQuiz();
+        });
+        opts.appendChild(b);
+      });
+      if (quiz.picked) {
+        var r = el("q-result");
+        r.innerHTML =
+          "<div class='row-between'><p style='margin:0;font-weight:600'>" +
+          (quiz.picked === quiz.target.id ? "🎉 صح! " : "مش دي — الصح: ") +
+          "مقام " + esc(quiz.target.name) + " — " + esc(quiz.target.mood) + "</p>" +
+          "<button type='button' class='btn-ghost' id='q-next'>جولة جديدة</button></div>";
+        el("q-next").addEventListener("click", function() { pickQuizRound(); renderQuiz(); });
+      }
+    }
+
+    /* ════════════════ قسم عبده داغر المجمّع — تدريب أذن ════════════════ */
+    function renderDagherEar() {
+      var box = el("dagher-ear");
+      if (!box) return;
+      box.innerHTML =
+        "<h2 class='font-display' style='font-size:1.3rem'>🎻 اسمع من أستاذ — تقاسيم عبده داغر</h2>" +
+        "<p class='small dim' style='margin:.3rem 0 0'>عبده داغر <strong>عازف كمان</strong> وملك التقاسيم — كل تسجيلاته آلية ومفيهاش غنا بصوته. اللي هتتعلمه منه هنا هو تدريب الأذن على الحقيقة: المقام بيتحرك ازاي على إيد أستاذ — سيره اللحني، انتقالاته بين جنس الأصل وجنس الفرع، ووقفاته على الغماز قبل القفلة على الركوز. الفيديوهات بتشتغل من مشغّل يوتيوب الرسمي، وفيه تقاسيم إضافية مخصوصة جوه صفحة مقام النهاوند ومقام الكرد.</p>" +
+        "<div class='row' style='margin-top:.6rem'>" +
+          "<button type='button' class='chip-btn' id='dg-go-nahawand'>🎻 افتح النهاوند — ٤ تقاسيم ولونجا وسماعي</button>" +
+          "<button type='button' class='chip-btn' id='dg-go-kurd'>🎻 افتح الكرد — تقسيمة ١٩٩٨</button>" +
+        "</div>" +
+        DAGHER_GENERAL.map(function(v) { return dagherVideoHtml(v); }).join("") +
+        "<h3 style='margin-top:1.1rem'>💎 جوهرة سمعية — صوت بشري حقيقي وكمان</h3>" +
+        "<p class='small dim' style='margin:.3rem 0 0'>جلسة أستاذين: <strong>الشيخ محمد عمران</strong> هو اللي بيغنّي هنا (موّال وابتهال ديني — مش درس سلّم ولا غنا تعليمي)، و<strong>عبده داغر</strong> بيردّ عليه بالكمان. حطيناها في تدريب الأذن لأنها أجمل مثال على حوار الصوت البشري والآلة جوه نفس المقام.</p>" +
+        dagherVideoHtml(DAGHER_VOCAL);
+      el("dg-go-nahawand").addEventListener("click", function() {
+        selectedMaqamId = "nahawand"; renderMaqamPicker(); renderMaqamDetail();
+        el("maqam-detail").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      el("dg-go-kurd").addEventListener("click", function() {
+        selectedMaqamId = "kurd"; renderMaqamPicker(); renderMaqamDetail();
+        el("maqam-detail").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+
+    /* ════════════════ قسم البيانو والكوردات ════════════════ */
+    var chordRootMidi = 69, chordTypeId = "min";
+    var mainPiano = null, soloMaqamId = "hijaz", pianoSeq = null;
+
+    function playProgressionSeq(p) {
+      unlockAudio();
+      p.chords.forEach(function(c, i) {
+        var t = chordTypeById(c.type);
+        setTimeout(function() { playChord(t.intervals.map(function(iv) { return c.root + iv; })); }, i * 950);
+      });
+    }
+
+    function renderChordBuilder() {
+      var box = el("chord-builder");
+      var ct = chordTypeById(chordTypeId);
+      var root = null;
+      ROOTS.forEach(function(r) { if (r.midi === chordRootMidi) root = r; });
+      if (!root) root = ROOTS[9];
+      var chordMidis = ct.intervals.map(function(i) { return chordRootMidi + i; });
+      if (mainPiano) mainPiano.setHighlights(chordMidis);
+
+      box.innerHTML =
+        "<section class='card' aria-label='باني الكوردات'>" +
+          "<h2 class='font-display' style='font-size:1.3rem'>باني الكوردات</h2>" +
+          "<div class='alt-box' style='margin-top:.6rem'><p class='small' style='margin:0'><strong>يعني إيه كورد؟</strong> " +
+          "الكورد هو ٣ نغمات أو أكتر بيتعزفوا مع بعض في نفس اللحظة وبيعملوا «لون» واحد — هو المصاحبة اللي الغنا بيقف عليها. " +
+          "اختار الأصل (أول نغمة) ونوع الكورد، واسمع اللون بيختلف إزاي. و<strong>الأربيجو</strong> هو نفس النغمات بس واحدة ورا التانية.</p></div>" +
+          "<p class='small' style='margin:.8rem 0 0;font-weight:600'>الأصل (الروت)</p>" +
+          "<div class='row' id='cb-roots' style='gap:.4rem;margin-top:.3rem'></div>" +
+          "<p class='small' style='margin:.8rem 0 0;font-weight:600'>نوع الكورد</p>" +
+          "<div class='row' id='cb-types' style='gap:.4rem;margin-top:.3rem'></div>" +
+          "<div class='row' style='margin-top:1rem'><span class='font-display' style='font-size:1.7rem;font-weight:700'>" + esc(root.name + ct.suffix) + "</span>" +
+          "<span class='small dim'>النغمات: " + ct.intervals.map(function(i) { return PC_NAMES[((chordRootMidi + i) % 12 + 12) % 12]; }).join(" – ") + "</span></div>" +
+          "<p class='small' style='margin:.3rem 0 0'>" + esc(ct.use) + "</p>" +
+          "<div class='row' style='margin-top:.7rem'>" +
+            "<button type='button' class='btn-accent' id='cb-play' style='flex:1'>▶ اعزف الكورد</button>" +
+            "<button type='button' class='btn-ghost' id='cb-arp' style='flex:1'>▶ أربيجو</button>" +
+          "</div>" +
+          "<p class='small dim' style='margin:.7rem 0 0'>صابعك: حط الإبهام على الأصل، والوسطى على الدرجة التالتة، والخنصر على الخامسة — دي وضعية البداية لأي كورد ثلاثي، وبعدها قرّب صوابعك لأقرب نغمات في الكورد اللي بعده (فويس ليدينج).</p>" +
+        "</section>";
+
+      var rootsBox = el("cb-roots");
+      ROOTS.forEach(function(r) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip-btn" + (r.midi === chordRootMidi ? " on" : "");
+        b.textContent = r.name;
+        b.setAttribute("aria-label", "أصل " + r.name);
+        b.setAttribute("aria-pressed", r.midi === chordRootMidi ? "true" : "false");
+        b.addEventListener("click", function() { chordRootMidi = r.midi; renderChordBuilder(); });
+        rootsBox.appendChild(b);
+      });
+      var typesBox = el("cb-types");
+      CHORD_TYPES.forEach(function(c) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip-btn" + (c.id === chordTypeId ? " on" : "");
+        b.textContent = c.name;
+        b.setAttribute("aria-label", "كورد " + c.name);
+        b.setAttribute("aria-pressed", c.id === chordTypeId ? "true" : "false");
+        b.addEventListener("click", function() { chordTypeId = c.id; renderChordBuilder(); });
+        typesBox.appendChild(b);
+      });
+      el("cb-play").addEventListener("click", function() { unlockAudio(); playChord(chordMidis); });
+      el("cb-arp").addEventListener("click", function() { unlockAudio(); playChord(chordMidis, true); });
+    }
+
+    function renderProgressions() {
+      var box = el("progressions");
+      box.innerHTML = "<section class='card' aria-label='تسلسلات كوردات مشهورة'>" +
+        "<h2 class='font-display' style='font-size:1.3rem'>تسلسلات من الأغاني العربية</h2>" +
+        "<p class='small dim' style='margin:.3rem 0 0'>التسلسل هو كوردات ورا بعض بترتيب ثابت بيتكرر طول الأغنية. دوس على أي كورد تسمعه لوحده، أو شغّل التسلسل كله.</p>" +
+        "<div id='prog-list'></div></section>";
+      var list = el("prog-list");
+      PROGRESSIONS.forEach(function(p) {
+        var card = document.createElement("div");
+        card.className = "alt-box";
+        card.style.marginTop = ".7rem";
+        var head = document.createElement("div");
+        head.className = "row-between";
+        head.innerHTML = "<p style='margin:0;font-weight:700'>" + esc(p.title) + "</p><span class='tiny dim'>" + esc(p.maqamHint) + "</span>";
+        card.appendChild(head);
+        var row = document.createElement("div");
+        row.className = "row";
+        row.style.marginTop = ".5rem";
+        p.chords.forEach(function(c, i) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.className = "chip-btn";
+          b.style.background = "var(--surface)";
+          b.textContent = c.label;
+          b.setAttribute("aria-label", "اعزف كورد " + c.label);
+          b.addEventListener("click", function() {
+            unlockAudio();
+            var t = chordTypeById(c.type);
+            playChord(t.intervals.map(function(iv) { return c.root + iv; }));
+          });
+          row.appendChild(b);
+          if (i < p.chords.length - 1) {
+            var arr = document.createElement("span");
+            arr.setAttribute("aria-hidden", "true");
+            arr.textContent = "←";
+            row.appendChild(arr);
+          }
+        });
+        var all = document.createElement("button");
+        all.type = "button";
+        all.className = "btn-accent";
+        all.style.minHeight = "2.5rem";
+        all.textContent = "▶ التسلسل كله";
+        all.setAttribute("aria-label", "اعزف تسلسل " + p.title + " كاملًا");
+        all.addEventListener("click", function() { playProgressionSeq(p); });
+        row.appendChild(all);
+        card.appendChild(row);
+        var tip = document.createElement("p");
+        tip.className = "small";
+        tip.style.margin = ".5rem 0 0";
+        tip.textContent = p.tip;
+        card.appendChild(tip);
+        list.appendChild(card);
+      });
+    }
+
+    function renderSolo() {
+      var box = el("solo-section");
+      var m = maqamById(soloMaqamId);
+      box.innerHTML =
+        "<section class='card' aria-label='المصاحبة والصولو'>" +
+          "<h2 class='font-display' style='font-size:1.3rem'>إزاي تصاحب وتعمل صولو</h2>" +
+          "<div class='small' style='margin-top:.5rem;line-height:1.8'>" +
+            "<p style='margin:0'><strong>اليد الشمال (الباص):</strong> اضرب أصل الكورد على أول المازورة، ولو الإيقاع وحدة (٤/٤) كرّر خفيف على النبضة التالتة. الباص الثابت هو اللي بيدّي الغنا أرض يقف عليها.</p>" +
+            "<p style='margin:.4rem 0 0'><strong>اليد اليمين:</strong> اضرب الكورد مقطّع على نمط الوحدة: دُم (١) — تَك (٢) — دُم (٣) — تَك (٤)، أو اعزفه أربيجو طالع نازل لما الغنا يهدا.</p>" +
+            "<p style='margin:.4rem 0 0'><strong>الصولو:</strong> مش سرعة وبس — الصولو العربي جُمَل قصيرة من سلم المقام بينها وقفات، مع عُرَب: تريل سريع على النغمة اللي قبل القفلة، وزحلقة (جلايساندو) للنغمة المهمة، وتكرار نغمة بلمسات خفيفة (غمزة). (شرح «العُرب» بالتفصيل في قاموس المصطلحات في قسم المقامات.) اختار مقام واتدرّب على جُمَله:</p>" +
+          "</div>" +
+          "<div class='row' id='solo-picker' style='margin-top:.7rem'></div>" +
+          "<div id='solo-phrases'></div>" +
+        "</section>";
+      var picker = el("solo-picker");
+      MAQAMAT.forEach(function(mm) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip-btn" + (mm.id === soloMaqamId ? " on" : "");
+        b.textContent = mm.name;
+        b.setAttribute("aria-label", "صولو مقام " + mm.name);
+        b.setAttribute("aria-pressed", mm.id === soloMaqamId ? "true" : "false");
+        b.addEventListener("click", function() { soloMaqamId = mm.id; renderSolo(); });
+        picker.appendChild(b);
+      });
+      var ph = el("solo-phrases");
+      m.phrases.forEach(function(p, pi) {
+        var card = document.createElement("div");
+        card.style.cssText = "border:1px solid var(--border);border-radius:.75rem;padding:.75rem;margin-top:.6rem";
+        card.innerHTML =
+          "<div class='row-between'><p style='margin:0;font-weight:600'>" + esc(p.title) + " — " + esc(m.name) + "</p>" +
+          "<span class='row'>" +
+            "<button type='button' class='chip-btn' data-act='play'>▶ اسمعها</button>" +
+            "<button type='button' class='chip-btn' data-act='coach'>🎤 بالمايك</button>" +
+            "<button type='button' class='chip-btn' data-act='cr'>🗣️ غنّي ورايا</button>" +
+          "</span></div>" +
+          "<p class='small dim' style='margin:.3rem 0 0'>" + esc(p.tip) + "</p>";
+        card.querySelector("[data-act='play']").addEventListener("click", function() {
+          unlockAudio();
+          pianoSeq.play(p.notes.map(function(s) { return m.tonicMidi + s; }), 380);
+        });
+        card.querySelector("[data-act='coach']").addEventListener("click", function() {
+          setCoachConfig({ title: "تدريب مايك: " + p.title + " (" + m.name + ")", targets: phraseTargets(m, p) });
+        });
+        card.querySelector("[data-act='cr']").addEventListener("click", function() { startCallResponse(m.id, "phrase", pi); });
+        ph.appendChild(card);
+      });
+    }
+    </script>
+
+    <script>
+    "use strict";
+    /* ════════════════ غنّي ورايا — أنا أقول وانت تقول بعدي ════════════════ */
+    var cr = { maqamId: "rast", mode: "scale", phraseIdx: 0, playing: false, seq: null };
+
+    (function buildCallResponse() {
+      var card = document.createElement("div");
+      card.className = "card";
+      card.id = "cr-card";
+      card.innerHTML =
+        "<h3 class='font-display' style='font-size:1.3rem'>🗣️ غنّي ورايا — أنا أقول، وانت تقول بعدي بصوتك</h3>" +
+        "<p class='small dim' style='margin:.35rem 0 0'>ده أساس تعليم الغنا: هنا هتسمع المقام قبلك <strong>بصوت التطبيق المُصنّع للتدريب التفاعلي</strong> — بيغنّي كل نغمة على «آه» بدرجتها بالظبط (بما فيها الربع تون)، مش نوتات بيانو — سلّمه أو جملة منه نغمة نغمة، واسم كل نغمة بيظهر كبير قدامك وهي بتتغنّى. وعشان تسمع نفس السلّم <strong>بصوت بشري حقيقي</strong> من مدرّب فعلي، افتح كارت «اسمع السلّم بصوت بشري حقيقي — وقول وراه» في تبويب «مدرّس الغنا» أو في صفحة المقام نفسه وقول وراه هناك الأول. " +
+        "بعد ما يخلّص بييجي دورك: المايك اللايف بيسمعك وانت بتغنّي نفس النغمات بصوتك، وبيقارن كل نغمة بالمطلوب وبيصححك: صح ولا حاد ولا خافت ولا غلط، وبكام سنت، بدقة الربع تون. ولو غلطت، عيد وراه لحد ما تظبط.</p>" +
+        "<p class='small' style='margin:.6rem 0 0;font-weight:600'>اختار المقام</p>" +
+        "<div class='row' id='cr-maqams' style='gap:.4rem;margin-top:.3rem'></div>" +
+        "<p class='small' style='margin:.7rem 0 0;font-weight:600'>هنغنّي إيه؟</p>" +
+        "<div class='row' id='cr-modes' style='gap:.4rem;margin-top:.3rem'></div>" +
+        "<div id='cr-stage' style='margin-top:1rem;background:var(--surface-alt);border-radius:.75rem;padding:1rem;text-align:center;min-height:7.5rem;display:flex;flex-direction:column;align-items:center;justify-content:center'>" +
+          "<p class='small dim' id='cr-stage-label' style='margin:0'>هنا هتسمع صوت التطبيق المُصنّع للتدريب واسم النغمة هيظهر كبير — والصوت البشري الحقيقي في فيديو السلّم بتبويب مدرّس الغنا</p>" +
+          "<p class='font-display' id='cr-stage-note' style='margin:.2rem 0 0;font-size:3rem;font-weight:700;line-height:1.2' dir='ltr'>—</p>" +
+          "<p class='small' id='cr-stage-count' style='margin:0'></p>" +
+        "</div>" +
+        "<div class='row' style='margin-top:.8rem'>" +
+          "<button type='button' class='btn-accent' id='cr-listen' style='flex:1'>▶ قولي يا مدرب — اسمع وغنّي بعدك</button>" +
+        "</div>" +
+        "<div id='cr-turn' class='hidden' style='margin-top:.8rem;background:var(--good-bg);border-radius:.75rem;padding:.9rem;text-align:center'>" +
+          "<p style='margin:0;font-size:1.15rem;font-weight:700;color:var(--good)'>🎤 دورك دلوقتي! غنّي نفس النغمات بصوتك</p>" +
+          "<p class='small' style='margin:.3rem 0 0;color:#bfe9d2'>دوس الزرار والمايك هيفتح ويسمعك نغمة نغمة ويصححك فوق في المدرب. غلطت؟ دوس «قولي يا مدرب» واسمع وجرّب تاني.</p>" +
+          "<button type='button' class='btn-accent' id='cr-sing' style='margin-top:.6rem;background:var(--good);color:#12291d'>🎤 ابدأ دوري — غنّي بالمايك</button>" +
+        "</div>";
+      var coachCard = el("coach-card");
+      coachCard.parentNode.insertBefore(card, coachCard.nextSibling);
+      renderCrPickers();
+
+      el("cr-listen").addEventListener("click", function() {
+        if (cr.playing) return;
+        unlockAudio();
+        var data = crData();
+        cr.playing = true;
+        el("cr-turn").classList.add("hidden");
+        el("cr-listen").disabled = true;
+        el("cr-stage-label").textContent = "اسمع صوت التطبيق المُصنّع بيغنّي " + data.title + " للتدريب…";
+        cr.seq = playVoiceSequence(data.midis, 700,
+          function(i) {
+            el("cr-stage-note").textContent = data.labels[i];
+            el("cr-stage-count").textContent = "نغمة " + (i + 1) + " من " + data.midis.length;
+          },
+          function() {
+            cr.playing = false;
+            el("cr-listen").disabled = false;
+            el("cr-stage-label").textContent = "خلّصت! احفظ النغمات في ودنك…";
+            el("cr-stage-note").textContent = "🎤";
+            el("cr-stage-count").textContent = "";
+            el("cr-turn").classList.remove("hidden");
+            el("cr-turn").scrollIntoView({ behavior: "smooth", block: "center" });
+          });
+      });
+
+      el("cr-sing").addEventListener("click", function() {
+        unlockAudio();
+        var data = crData();
+        var m = maqamById(cr.maqamId);
+        setCoachConfig({ title: "غنّي ورايا: " + data.title + " (" + m.name + ")", targets: data.targets, voice: true });
+        if (!coach.listening && !coach.starting) startCoach();
+      });
+    })();
+
+    function crData() {
+      var m = maqamById(cr.maqamId);
+      if (cr.mode === "phrase") {
+        var p = m.phrases[cr.phraseIdx % m.phrases.length];
+        return {
+          title: p.title,
+          midis: p.notes.map(function(s) { return m.tonicMidi + s; }),
+          labels: p.notes.map(function(s) { return englishNoteName(m.tonicMidi + s); }),
+          targets: phraseTargets(m, p)
+        };
+      }
+      var targets = scaleTargets(m, true);
+      return {
+        title: "سلّم " + m.name + " صعودًا ونزولًا",
+        midis: targets.map(function(t) { return t.midi; }),
+        labels: targets.map(function(t) { return t.label; }),
+        targets: targets
+      };
+    }
+
+    function renderCrPickers() {
+      var mq = el("cr-maqams");
+      mq.innerHTML = "";
+      MAQAMAT.forEach(function(m) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip-btn" + (m.id === cr.maqamId ? " on" : "");
+        b.textContent = m.name;
+        b.setAttribute("aria-label", "غنّي ورايا على مقام " + m.name);
+        b.setAttribute("aria-pressed", m.id === cr.maqamId ? "true" : "false");
+        b.addEventListener("click", function() { cr.maqamId = m.id; cr.phraseIdx = 0; renderCrPickers(); });
+        mq.appendChild(b);
+      });
+      var md = el("cr-modes");
+      md.innerHTML = "";
+      var m = maqamById(cr.maqamId);
+      var modes = [{ id: "scale", label: "السلّم كله طالع نازل" }];
+      m.phrases.forEach(function(p, i) { modes.push({ id: "phrase" + i, label: p.title }); });
+      modes.forEach(function(mode) {
+        var active = mode.id === "scale" ? cr.mode === "scale" : (cr.mode === "phrase" && cr.phraseIdx === Number(mode.id.replace("phrase", "")));
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip-btn" + (active ? " on" : "");
+        b.textContent = mode.label;
+        b.setAttribute("aria-pressed", active ? "true" : "false");
+        b.addEventListener("click", function() {
+          if (mode.id === "scale") cr.mode = "scale";
+          else { cr.mode = "phrase"; cr.phraseIdx = Number(mode.id.replace("phrase", "")); }
+          renderCrPickers();
+        });
+        md.appendChild(b);
+      });
+    }
+
+    function startCallResponse(maqamId, mode, phraseIdx) {
+      cr.maqamId = maqamId;
+      cr.mode = mode;
+      cr.phraseIdx = phraseIdx || 0;
+      renderCrPickers();
+      showTab("coach");
+      el("cr-card").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    /* ════════════════ مدرّس الغنا الصوتي — دروس زي مدرّبين اليوتيوب ════════════════
+       المدرب بيغنّي كل خطوة بصوته الغنائي (على «آه»، بدرجة النغمة بالظبط
+       بما فيها الربع تون)، وبعد كل خطوة دور الطالب يغنّي وراه بالمايك اللايف
+       ويتصحّح — نفس أسلوب «اسمع وغنّي بعدي» عند أساتذة المقام على يوتيوب،
+       بس الصوت هنا متولّد من التطبيق نفسه على جهاز المستخدم. */
+    function singTargetsFor(m, semis) { return phraseTargets(m, { notes: semis }); }
+
+    function maqamSingLesson(m, level) {
+      var rootSemis = m.notes.slice(0, 4).map(function(n) { return n[1]; });
+      var branchSemis = m.notes.slice(4).map(function(n) { return n[1]; });
+      var scaleSemis = m.notes.map(function(n) { return n[1]; });
+      var upDown = function(list) {
+        return list.concat(list.slice().reverse().slice(1));
+      };
+      return {
+        maqamId: m.id, level: level, mins: "٧ دقايق",
+        title: "غنّي مقام " + m.name + " — من الركوز للقفلة",
+        desc: "درس " + m.name + " الكامل جنس جنس: " + m.character,
+        steps: [
+          { title: "جنس الأصل — قلب المقام", semis: upDown(rootSemis),
+            say: "اسمعني وغنّي بعدي: ده جنس أصل " + m.name + " — «" + m.jins[0] + "» — أول أربع نغمات: " +
+                 m.notes.slice(0, 4).map(function(n) { return n[0]; }).join(" – ") +
+                 ". ركّز على إحساس أول نغمة (الركوز " + m.tonicName + ") وخلّي صوتك يرجعلها في الآخر زي ما أنا عملت." },
+          { title: "جنس الفرع — من الغماز للجواب", semis: upDown(branchSemis),
+            say: "ودلوقتي جنس الفرع — «" + m.jins[1] + "» — بيبدأ من الغماز " + (m.notes[4] ? m.notes[4][0] : m.tonicName) +
+                 " (محطة الوقوف في نص الجملة) وبيطلع للجواب ويرجع. غنّيه ورايا على «آه» من غير ما تستعجل." },
+          { title: "السلم كله طالع نازل", semis: upDown(scaleSemis),
+            say: "نجمع الجنسين على بعض: سلم " + m.name + " كله، طالع نازل على «آه». سمّي كل نغمة في سرّك وانت بتسمعني، وبعدين غنّيه ورايا بنفس البطء." },
+          { title: "جملة غنائية: " + m.phrases[0].title, semis: m.phrases[0].notes.slice(),
+            say: "دي جملة غنائية حقيقية من " + m.name + ": «" + m.phrases[0].title + "». " + m.phrases[0].tip + " اسمعها مني الأول، وبعدين غنّيها ورايا جملة واحدة من غير تقطيع." },
+          { title: "القفلة: " + m.phrases[1].title, semis: m.phrases[1].notes.slice(),
+            say: "وآخر خطوة القفلة: «" + m.phrases[1].title + "». " + m.phrases[1].tip + " القفلة هي النقطة اللي في آخر الجملة — لازم تنتهي ثابت على الركوز " + m.tonicName + "." }
+        ]
+      };
+    }
+
+    var SING_LESSONS = [
+      { maqamId: "rast", level: "مبتدئ", mins: "٥ دقايق",
+        title: "قبل ما نغنّي: التسخين وتثبيت الركوز",
+        desc: "أي مدرّب غنا على يوتيوب بيبدأ كده: نَفَس، تسخين هادي، وتثبيت نغمة الركوز في ودنك قبل أي مقام.",
+        steps: [
+          { title: "ثبّت الركوز في ودنك", semis: [0, 0, 0, 0],
+            say: "أنا هغنّي الركوز C أربع مرات على «آه»، كل مرة أطوّل شوية. اسمع ثبات النغمة — لا بتطلع ولا بتنزل. دي النغمة «البيت» اللي كل حاجة بترجعلها. غنّيها ورايا بنفس الثبات." },
+          { title: "تسخين نازل على مهلك", semis: [12, 10.5, 9, 7, 5, 3.5, 2, 0],
+            say: "تسخين هادي من الجواب للنزول للقرار على سلم الراست. خد نَفَس قبل ما تبدأ، وخلّي كل نغمة تنزل على اللي بعدها من غير قفزات في صوتك." },
+          { title: "تسخين طالع وبناء الصوت", semis: [0, 2, 3.5, 5, 7, 9, 10.5, 12],
+            say: "ودلوقتي طالعين: نفس السلم لفوق. لاحظ نغمات الربع تون (E half-flat وB half-flat) وانت بتسمعني — صوتك يقدر يجيبهم حتى لو البيانو ميقدرش." },
+          { title: "قفزات خفيفة من الركوز", semis: [0, 7, 0, 5, 0, 3.5, 0],
+            say: "آخر تسخينة: قفزات من الركوز للغماز G ورجوع، وبعدين لـF ولـE half-flat ورجوع. كل مرة ارجع اثبت على C — ده تمرين ملك المقامات نفسه على تثبيت الركوز." }
+        ]
+      }
+    ];
+    (function buildSingLessons() {
+      var levels = { rast: "مبتدئ", bayati: "مبتدئ", hijaz: "متوسط", nahawand: "مبتدئ", kurd: "مبتدئ", saba: "متقدم", sikah: "متقدم", ajam: "مبتدئ", hijazkar: "متقدم" };
+      MAQAMAT.forEach(function(m) { SING_LESSONS.push(maqamSingLesson(m, levels[m.id] || "متوسط")); });
+      SING_LESSONS.push({
+        maqamId: "hijaz", level: "متقدم", mins: "٦ دقايق",
+        title: "العُرب والقفلة — من النغمات الصح للطرب",
+        desc: "الدرس الأخير: الزخارف اللي بتفرّق الغنا المدرسي عن الطرب — تريل وزحلقة وغمزة — على حجاز، وبعدين قفلة كاملة بيهم.",
+        steps: [
+          { title: "التريل — اهتزاز سريع قبل القفلة", semis: [5, 4, 5, 4, 5, 7, 5, 4, 1, 0],
+            say: "التريل هو تهزيز النغمة مع اللي جنبها بسرعة: اسمعني بهزّ F♯ مع G قبل ما أنزل أقفل. جرّبها ورايا خفيفة — العُربة زينة، مش استعراض سرعة." },
+          { title: "الزحلقة — تنزلق للنغمة المهمة", semis: [7, 5, 4, 1, 0],
+            say: "الزحلقة: بنزلق من الغماز G نزولًا لحد الركوز D من غير ما أقطّع النغمات. اسمع النزلة متصلة ازاي، وغنّيها ورايا كأن صوتك بينزل على سلّم ناعم." },
+          { title: "الغمزة — تكرار خفيف بنبض", semis: [7, 7, 5, 5, 4, 4, 1, 0],
+            say: "الغمزة تكرار خفيف للنغمة بنبضة من الحنجرة، مش إعادة غنا من الأول. اسمع التكرار الخفيف على كل نغمة وقلّده — دي لمسة المواويل المشهورة." },
+          { title: "قفلة كاملة بالعُرب", semis: [7, 8, 7, 5, 4, 5, 4, 1, 0],
+            say: "نجمع كل حاجة: لازمة حجازية كاملة فيها تريل وزحلقة وبتنتهي بقفلة ثابتة على الركوز D. غنّيها ورايا مرة واحدة كاملة، ولو وقفت في حتة عيد الخطوة دي لوحدها." }
+        ]
+      });
+    })();
+
+    var sing = { lessonIdx: 1, stepIdx: -1, playing: false, seq: null, gapTimer: null };
+
+    function singLesson() { return SING_LESSONS[sing.lessonIdx]; }
+    function singMaqam() { return maqamById(singLesson().maqamId); }
+
+    function stopSing() {
+      if (sing.seq) { sing.seq.cancel(); sing.seq = null; }
+      if (sing.gapTimer) { clearTimeout(sing.gapTimer); sing.gapTimer = null; }
+      sing.playing = false;
+      var eq = el("sing-eq"); if (eq) eq.classList.remove("on");
+      var lp = el("sing-play-lesson"); if (lp) lp.disabled = false;
+    }
+
+    function renderSingStage() {
+      var mount = el("sing-stage-mount");
+      if (!mount || mount.dataset.built) { renderSingSteps(); return; }
+      mount.dataset.built = "1";
+      mount.innerHTML =
+        "<div class='sing-stage' id='sing-stage'>" +
+          "<p class='small' id='sing-stage-label' style='margin:0;color:#b8a888'>المدرب جاهز — اختار درس من القايمة تحت أو شغّل درس مقام الراست</p>" +
+          "<p class='sing-note font-display' id='sing-stage-note'>🎤</p>" +
+          "<div class='sing-eq' id='sing-eq' aria-hidden='true'><span></span><span></span><span></span><span></span><span></span></div>" +
+          "<div class='sing-caption' id='sing-caption'>كلام المدرب هيظهر هنا وانت بتسمعه بيغنّي — زي تعليقات دروس اليوتيوب.</div>" +
+          "<div class='row' style='margin-top:.8rem;justify-content:center'>" +
+            "<button type='button' class='btn-accent' id='sing-play-lesson'>▶ شغّل الدرس كله بصوت المدرب</button>" +
+            "<button type='button' class='btn-ghost' id='sing-stop' style='color:#f3ead3;border-color:#7a6a4f'>⏹ وقّف</button>" +
+          "</div>" +
+          "<div id='sing-turn' class='hidden' style='margin-top:.8rem;background:var(--good-bg);border-radius:.75rem;padding:.85rem'>" +
+            "<p style='margin:0;font-weight:700;color:var(--good)'>🎤 دورك! غنّي نفس الخطوة ورا المدرب</p>" +
+            "<p class='small' style='margin:.3rem 0 0;color:#bfe9d2'>دوس الزرار والمايك اللايف هيفتح في المدرب فوق ويسمعك نغمة نغمة ويصححك بالسنت. غلطت؟ ارجع هنا وعيد سماع الخطوة.</p>" +
+            "<button type='button' class='btn-accent' id='sing-sing-step' style='margin-top:.6rem;background:var(--good);color:#12291d'>🎤 دوري — أغنّي وراه بالمايك</button>" +
+          "</div>" +
+        "</div>";
+      el("sing-play-lesson").addEventListener("click", function() {
+        unlockAudio();
+        playSingLesson();
+      });
+      el("sing-stop").addEventListener("click", function() {
+        stopSing();
+        el("sing-stage-label").textContent = "المدرب وقّف — دوس أي خطوة عشان تسمعها لوحدها";
+        el("sing-stage-note").textContent = "🎤";
+      });
+      el("sing-sing-step").addEventListener("click", function() {
+        unlockAudio();
+        var lesson = singLesson(), m = singMaqam();
+        var idx = sing.stepIdx >= 0 ? sing.stepIdx : 0;
+        var step = lesson.steps[idx];
+        setCoachConfig({
+          title: "مدرّس الغنا: " + step.title + " (" + m.name + ")",
+          targets: singTargetsFor(m, step.semis), voice: true
+        });
+        if (!coach.listening && !coach.starting) startCoach();
+      });
+      renderSingSteps();
+    }
+
+    function renderSingHumanVideo() {
+      var mount = el("sing-human-video");
+      if (!mount) return;
+      var m = singMaqam();
+      mount.innerHTML = humanScaleCardHtml(m, "h3");
+      bindYtFacades(mount);
+    }
+
+    function renderSingSteps() {
+      var box = el("sing-steps");
+      if (!box) return;
+      var lesson = singLesson(), m = singMaqam();
+      renderSingHumanVideo();
+      var html = "<h3 style='margin:1rem 0 0;font-size:1.05rem'>خطوات الدرس: " + esc(lesson.title) + "</h3>" +
+        "<p class='small dim' style='margin:.25rem 0 0'>مقام " + esc(m.name) + " · الركوز " + esc(m.tonicName) + " · دوس «اسمعها متغنّية» لأي خطوة عشان المدرب يغنّيها لك لوحدها، وبعدين «أغنّي وراها» عشان تردّد وتتصحّح.</p>";
+      box.innerHTML = html;
+      lesson.steps.forEach(function(step, i) {
+        var row = document.createElement("div");
+        row.className = "sing-step" + (i === sing.stepIdx ? " on" : "");
+        row.innerHTML =
+          "<span class='ss-num'>" + (i + 1) + "</span>" +
+          "<span style='flex:1;min-width:0'><span style='font-weight:700'>" + esc(step.title) + "</span>" +
+          "<span class='small dim' style='display:block;margin-top:.15rem'>" + esc(step.say) + "</span>" +
+          "<span class='row' style='margin-top:.45rem'>" +
+            "<button type='button' class='chip-btn' data-sing-act='listen'>🗣️ اسمعها متغنّية</button>" +
+            "<button type='button' class='chip-btn' data-sing-act='sing'>🎤 أغنّي وراها</button>" +
+          "</span></span>";
+        row.querySelector("[data-sing-act='listen']").addEventListener("click", function() {
+          unlockAudio();
+          playSingStep(i, null);
+        });
+        row.querySelector("[data-sing-act='sing']").addEventListener("click", function() {
+          unlockAudio();
+          sing.stepIdx = i;
+          renderSingSteps();
+          setCoachConfig({
+            title: "مدرّس الغنا: " + step.title + " (" + m.name + ")",
+            targets: singTargetsFor(m, step.semis), voice: true
+          });
+          if (!coach.listening && !coach.starting) startCoach();
+        });
+        box.appendChild(row);
+      });
+    }
+
+    function playSingStep(i, after) {
+      stopSing();
+      var lesson = singLesson(), m = singMaqam();
+      var step = lesson.steps[i];
+      if (!step) { if (after) after(); return; }
+      sing.stepIdx = i;
+      sing.playing = true;
+      renderSingSteps();
+      el("sing-turn").classList.add("hidden");
+      el("sing-stage-label").textContent = "المدرب بيغنّي: " + step.title + " — مقام " + m.name;
+      el("sing-caption").textContent = "🗣️ المدرب بيقول: " + step.say;
+      el("sing-eq").classList.add("on");
+      var midis = step.semis.map(function(s) { return m.tonicMidi + s; });
+      var labels = step.semis.map(function(s) { return englishNoteName(m.tonicMidi + s); });
+      sing.seq = playVoiceSequence(midis, 720,
+        function(idx) { el("sing-stage-note").textContent = labels[idx]; },
+        function() {
+          sing.playing = false;
+          sing.seq = null;
+          el("sing-eq").classList.remove("on");
+          el("sing-stage-label").textContent = "المدرب خلّص الخطوة — احفظها في ودنك";
+          el("sing-stage-note").textContent = "🎤";
+          if (after) { after(); return; }
+          el("sing-turn").classList.remove("hidden");
+          el("sing-turn").scrollIntoView({ behavior: "smooth", block: "center" });
+        });
+    }
+
+    function playSingLesson() {
+      var lesson = singLesson();
+      el("sing-play-lesson").disabled = true;
+      function next(i) {
+        if (i >= lesson.steps.length) {
+          el("sing-play-lesson").disabled = false;
+          el("sing-stage-label").textContent = "خلّص الدرس كله! عيد أي خطوة لوحدك أو غنّي ورا المدرب بالمايك";
+          el("sing-caption").textContent = "🗣️ المدرب بيقول: برافو — كده سمعت درس «" + lesson.title + "» كله. أهم حاجة دلوقتي الترديد بصوتك: اختار أصعب خطوة وغنّيها ورايا بالمايك لحد ما تثبت.";
+          sing.stepIdx = lesson.steps.length - 1;
+          renderSingSteps();
+          el("sing-turn").classList.remove("hidden");
+          return;
+        }
+        playSingStep(i, function() {
+          sing.gapTimer = setTimeout(function() { next(i + 1); }, 1100);
+        });
+      }
+      next(0);
+    }
+
+    function renderSingPlaylist() {
+      var box = el("sing-playlist");
+      if (!box) return;
+      box.innerHTML = "";
+      SING_LESSONS.forEach(function(lesson, i) {
+        var m = maqamById(lesson.maqamId);
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "lesson-row" + (i === sing.lessonIdx ? " on" : "");
+        b.setAttribute("aria-label", "افتح درس " + lesson.title);
+        b.setAttribute("aria-pressed", i === sing.lessonIdx ? "true" : "false");
+        b.innerHTML =
+          "<span class='lesson-thumb'><span class='lt-play'>▶</span><span class='lt-name'>" + esc(m.name) + "</span><span class='lt-dur'>" + esc(lesson.mins) + "</span></span>" +
+          "<span class='lesson-meta'><h3>" + (i + 1) + ". " + esc(lesson.title) + "</h3>" +
+          "<p class='small dim'>" + esc(lesson.desc) + "</p>" +
+          "<p class='tiny dim' style='margin-top:.3rem'>" + esc(lesson.level) + " · " + lesson.steps.length + " خطوات · المدرب بيغنّي وانت تردّد وراه بالمايك</p></span>";
+        b.addEventListener("click", function() {
+          stopSing();
+          sing.lessonIdx = i;
+          sing.stepIdx = -1;
+          renderSingPlaylist();
+          renderSingStage();
+          el("sing-stage-label").textContent = "الدرس جاهز: " + lesson.title;
+          el("sing-stage-note").textContent = "🎤";
+          el("sing-caption").textContent = "🗣️ المدرب بيقول: أهلًا بيك في درس «" + lesson.title + "». دوس «شغّل الدرس كله» واسمعني للآخر، أو ابدأ بخطوة خطوة من تحت.";
+          el("sing-stage").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+        box.appendChild(b);
+      });
+    }
+
+    renderSingPlaylist();
+    renderSingStage();
+
+    /* ════════════════ خطة اليوم ════════════════ */
+    function localDateStr(d) {
+      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    }
+    function dayOfYearOf(d) {
+      return Math.floor((d.getTime() - new Date(d.getFullYear(), 0, 0).getTime()) / 86400000);
+    }
+    function fmtClock(s) {
+      return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+    }
+
+    var plan = { elapsed: 0, running: false, doneSteps: {}, dayDone: false, timerId: null, seq: null };
+
+    function renderPlan() {
+      var now = new Date();
+      var doy = dayOfYearOf(now);
+      var maqam = MAQAMAT[doy % MAQAMAT.length];
+      var phrase = maqam.phrases[doy % maqam.phrases.length];
+      var progression = PROGRESSIONS[doy % PROGRESSIONS.length];
+      var song = maqam.famous[doy % maqam.famous.length];
+      var scaleMidis = maqam.notes.map(function(n) { return maqam.tonicMidi + n[1]; });
+      var TOTAL = 15 * 60;
+
+      var steps = [
+        { title: "إحماء: سلم مقام اليوم", minutes: 3,
+          desc: "اطلع وانزل سلم " + maqam.name + " على مهلك، وسمّي كل نغمة بصوت عالي وانت بتعزفها أو بتغنيها — التسمية بتثبّت النغمة في ودنك.",
+          bodyId: "step-scale" },
+        { title: "جملة الصولو: " + phrase.title, minutes: 3, desc: phrase.tip, bodyId: "step-phrase" },
+        { title: "كوردات: " + progression.title, minutes: 4, desc: progression.tip, bodyId: "step-chords" },
+        { title: "تدريب الأذن: ده مقام إيه؟", minutes: 3,
+          desc: "اسمع السلم المجهول وخمّن المقام من غير ما تبص. الأذن اللي بتميّز المقامات بسرعة هي نص الشغل في الغنا والعزف.",
+          bodyId: "step-ear" },
+        { title: "تطبيق حر وغنّي ورايا على أغنية اليوم", minutes: 2,
+          desc: "النهارده دور «" + song + "» — من أشهر ما اتغنى على " + maqam.name + ". ارتجل بحرية على نغمات المقام بالمايك اللايف، وجرّب «غنّي ورايا» على جملة اليوم.",
+          bodyId: "step-free" }
+      ];
+      var bounds = [0];
+      steps.forEach(function(s) { bounds.push(bounds[bounds.length - 1] + s.minutes * 60); });
+
+      var weekAhead = "";
+      for (var i = 0; i < 7; i++) {
+        var d = new Date(now); d.setDate(d.getDate() + i);
+        var mm = MAQAMAT[dayOfYearOf(d) % MAQAMAT.length];
+        weekAhead += "<li><p style='margin:0;font-weight:600'>" + d.toLocaleDateString("ar-EG", { weekday: "long" }) +
+          " <span class='small dim' style='font-weight:400'>· " + d.toLocaleDateString("ar-EG", { day: "numeric", month: "long" }) + "</span></p>" +
+          "<p style='margin:0'><span style='font-weight:700'>مقام " + esc(mm.name) + "</span>" +
+          (i === 0 ? " <span class='tag-now'>النهارده</span>" : "") + "</p></li>";
+      }
+      var last7 = "";
+      for (var j = 6; j >= 0; j--) {
+        var dd = new Date(now); dd.setDate(dd.getDate() - j);
+        last7 += "<div style='flex:1;display:flex;flex-direction:column;align-items:center;gap:.25rem'>" +
+          "<span class='day-dot" + (j === 0 ? " today" : "") + "' aria-hidden='true'>·</span>" +
+          "<span class='tiny dim'>" + dd.toLocaleDateString("ar-EG", { weekday: "short" }) + "</span></div>";
+      }
+
+      var box = el("plan-content");
+      box.innerHTML =
+        "<section class='card' aria-label='تركيز اليوم'>" +
+          "<div class='row-between'><h2 class='font-display' style='font-size:1.3rem'>" +
+            now.toLocaleDateString("ar-EG", { weekday: "long", day: "numeric", month: "long" }) + "</h2>" +
+            "<span class='small' style='font-weight:600;color:var(--accent)'>ركّز النهارده وخلّي السلسلة تكمل بكرة</span></div>" +
+          "<div style='display:grid;gap:.5rem;margin-top:.7rem' id='plan-focus'>" +
+            "<div class='alt-box'><p class='tiny dim' style='margin:0'>مقام اليوم</p><p class='font-display' style='margin:.1rem 0 0;font-size:1.2rem;font-weight:700'>" + esc(maqam.name) + "</p>" +
+            "<p class='small dim' style='margin:0'>الركوز: " + esc(maqam.tonicName) + " — " + esc(maqam.mood) + "</p></div>" +
+            "<div class='alt-box'><p class='tiny dim' style='margin:0'>جملة اليوم</p><p class='font-display' style='margin:.1rem 0 0;font-size:1.2rem;font-weight:700'>" + esc(phrase.title) + "</p>" +
+            "<p class='small dim' style='margin:0'>من جُمَل صولو " + esc(maqam.name) + "</p></div>" +
+            "<div class='alt-box'><p class='tiny dim' style='margin:0'>أغنية اليوم</p><p class='font-display' style='margin:.1rem 0 0;font-size:1.2rem;font-weight:700'>" + esc(song.split(" — ")[0]) + "</p>" +
+            "<p class='small dim' style='margin:0'>" + esc(song.split(" — ")[1] || ("على مقام " + maqam.name)) + "</p></div>" +
+          "</div>" +
+          "<p class='small' style='margin:.9rem 0 0;font-weight:600'>أيام الأسبوع دي (علّم أيامك من زرار «خلّصت تدريب النهارده» تحت)</p>" +
+          "<div style='display:flex;gap:.4rem;margin-top:.4rem'>" + last7 + "</div>" +
+        "</section>" +
+
+        "<section class='card' aria-label='مؤقّت الجلسة'>" +
+          "<div class='row-between'><div>" +
+            "<p class='small dim' id='timer-state' style='margin:0'>جاهز تبدأ؟</p>" +
+            "<p class='timer-clock' id='timer-clock'>" + fmtClock(TOTAL) + "</p></div>" +
+            "<div class='row'>" +
+              "<button type='button' class='btn-accent' id='timer-toggle' style='min-height:3rem'>▶ ابدأ الجلسة</button>" +
+              "<button type='button' class='btn-ghost hidden' id='timer-reset' style='min-height:3rem'>من الأول</button>" +
+            "</div></div>" +
+          "<div class='progress' style='margin-top:.7rem' role='progressbar' aria-label='تقدّم الجلسة' aria-valuemin='0' aria-valuemax='" + TOTAL + "' aria-valuenow='0' id='timer-progress'><div style='width:0%'></div></div>" +
+          "<p class='small dim' style='margin:.5rem 0 0'>المؤقّت بيمشي معاك خطوة خطوة وبيظلّل الخطوة اللي دورها دلوقتي. ولو خلّصت بدري، علّم الخطوات بنفسك وسجّل اليوم.</p>" +
+        "</section>" +
+
+        "<ol id='plan-steps' style='list-style:none;margin:1rem 0 0;padding:0'></ol>" +
+
+        "<section class='card' aria-label='تسجيل إتمام اليوم' id='plan-done-box'></section>" +
+
+        "<section class='card' aria-label='مقامات الأسبوع الجاي'>" +
+          "<h2 class='font-display' style='font-size:1.3rem'>أسبوعك الجاي — مقام كل يوم</h2>" +
+          "<ul class='divider-list'>" + weekAhead + "</ul>" +
+          "<p class='small dim' style='margin:.5rem 0 0'>المقامات بتلف على التسعة كلهم بالدور، فكل أسبوع ونص بتكون غطيت المقامات كلها من غير ما تملّ من تكرار نفس المقام.</p>" +
+        "</section>" +
+
+        "<section class='card' aria-label='تحليل الأغاني'>" +
+          "<h2 class='font-display' style='font-size:1.3rem'>🔍 تحليل الأغاني</h2>" +
+          "<p class='small' style='margin:.4rem 0 0'>تحليل أي أغنية بالذكاء الاصطناعي (مقامها وكورداتها وإزاي تتغنى وتتلعب) مش موجود في نسخة Safari دي — التحليل محتاج النسخة الرئيسية من «مدرب المقامات والبيانو» اللي بتفتحها من تطبيق Muse. " +
+          "نسخة Safari دي مخصصة للتدريب اللايف بالمايك: المقامات والبيانو والكوردات وخطة اليوم و«غنّي ورايا».</p>" +
+        "</section>";
+
+      /* خطوات الخطة */
+      var ol = el("plan-steps");
+      steps.forEach(function(s, i) {
+        var li = document.createElement("li");
+        li.className = "card step-card";
+        li.style.marginTop = i === 0 ? "0" : ".75rem";
+        li.dataset.step = i;
+        li.innerHTML =
+          "<div style='display:flex;gap:.7rem;align-items:flex-start'>" +
+            "<button type='button' class='step-num' aria-label='علّم خطوة «" + esc(s.title) + "» كمكتملة'>" + (i + 1) + "</button>" +
+            "<div style='flex:1;min-width:0'>" +
+              "<div class='row' style='gap:.4rem'><h3 style='font-size:1.05rem'>" + esc(s.title) + "</h3>" +
+              "<span class='tag-time'>" + fmtClock(bounds[i]) + " – " + fmtClock(bounds[i + 1]) + " · " + s.minutes + " دقائق</span>" +
+              "<span class='tag-now hidden' data-now>دلوقتي دورها</span></div>" +
+              "<p class='small dim' style='margin:.3rem 0 0'>" + esc(s.desc) + "</p>" +
+              "<div style='margin-top:.5rem' id='" + s.bodyId + "'></div>" +
+            "</div></div>";
+        li.querySelector(".step-num").addEventListener("click", function() {
+          plan.doneSteps[i] = !plan.doneSteps[i];
+          paintPlanSteps();
+        });
+        ol.appendChild(li);
+      });
+
+      /* أجسام الخطوات */
+      var chips1 = noteChips(el("step-scale"), maqam.notes.map(function(n) { return { label: n[0], semi: n[1] }; }), maqam.tonicMidi);
+      plan.seq = makeSequencer(function(mm, idx) { chips1.setActiveIdx(idx >= 0 ? idx : null); });
+      var b1 = document.createElement("div");
+      b1.className = "row"; b1.style.marginTop = ".5rem";
+      b1.innerHTML = "<button type='button' class='btn-accent' style='min-height:2.5rem'>▶ اسمع الصعود والنزول</button>" +
+                     "<button type='button' class='btn-accent-outline' style='min-height:2.5rem'>🎤 اتدرّب بالمايك</button>";
+      b1.children[0].addEventListener("click", function() {
+        unlockAudio();
+        plan.seq.play(scaleMidis.concat(scaleMidis.slice().reverse().slice(1)), 430);
+      });
+      b1.children[1].addEventListener("click", function() {
+        setCoachConfig({ title: "خطة اليوم: سلم " + maqam.name + " صعودًا ونزولًا", targets: scaleTargets(maqam, true) });
+      });
+      el("step-scale").appendChild(b1);
+
+      var chips2 = noteChips(el("step-phrase"), phrase.notes.map(function(s) {
+        return { label: englishNoteName(maqam.tonicMidi + s), semi: s };
+      }), maqam.tonicMidi);
+      var b2 = document.createElement("div");
+      b2.className = "row"; b2.style.marginTop = ".5rem";
+      b2.innerHTML = "<button type='button' class='btn-accent' style='min-height:2.5rem'>▶ اسمع الجملة</button>" +
+                     "<button type='button' class='btn-accent-outline' style='min-height:2.5rem'>🎤 بالمايك</button>" +
+                     "<button type='button' class='btn-ghost' style='min-height:2.5rem'>🗣️ غنّي ورايا</button>";
+      b2.children[0].addEventListener("click", function() {
+        unlockAudio();
+        plan.seq.play(phrase.notes.map(function(s) { return maqam.tonicMidi + s; }), 400);
+      });
+      b2.children[1].addEventListener("click", function() {
+        setCoachConfig({ title: "خطة اليوم: " + phrase.title + " (" + maqam.name + ")", targets: phraseTargets(maqam, phrase) });
+      });
+      b2.children[2].addEventListener("click", function() {
+        startCallResponse(maqam.id, "phrase", maqam.phrases.indexOf(phrase));
+      });
+      el("step-phrase").appendChild(b2);
+
+      var b3 = document.createElement("div");
+      b3.innerHTML = "<p class='small dim' style='margin:0'>" + esc(progression.maqamHint) + " — الشمال على أصل كل كورد، واليمين تضرب الكورد بإيقاع الوحدة.</p>";
+      var row3 = document.createElement("div");
+      row3.className = "row"; row3.style.marginTop = ".5rem";
+      progression.chords.forEach(function(c, i) {
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "chip-btn"; b.textContent = c.label;
+        b.setAttribute("aria-label", "اعزف كورد " + c.label);
+        b.addEventListener("click", function() {
+          unlockAudio();
+          var t = chordTypeById(c.type);
+          playChord(t.intervals.map(function(iv) { return c.root + iv; }));
+        });
+        row3.appendChild(b);
+        if (i < progression.chords.length - 1) {
+          var arr = document.createElement("span"); arr.setAttribute("aria-hidden", "true"); arr.textContent = "←"; row3.appendChild(arr);
+        }
+      });
+      var all3 = document.createElement("button");
+      all3.type = "button"; all3.className = "btn-accent"; all3.style.minHeight = "2.5rem"; all3.textContent = "▶ التسلسل كله";
+      all3.addEventListener("click", function() { playProgressionSeq(progression); });
+      row3.appendChild(all3);
+      b3.appendChild(row3);
+      el("step-chords").appendChild(b3);
+
+      var b4 = document.createElement("button");
+      b4.type = "button"; b4.className = "btn-accent"; b4.style.minHeight = "2.75rem"; b4.textContent = "👂 افتح تدريب الأذن";
+      b4.addEventListener("click", function() {
+        showTab("maqamat");
+        el("ear-quiz").scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+      el("step-ear").appendChild(b4);
+
+      var b5 = document.createElement("div");
+      b5.className = "row";
+      b5.innerHTML = "<button type='button' class='btn-accent-outline' style='min-height:2.5rem'>🎤 ارتجل بالمايك اللايف</button>" +
+                     "<button type='button' class='btn-ghost' style='min-height:2.5rem'>🗣️ غنّي ورايا جملة اليوم</button>";
+      b5.children[0].addEventListener("click", function() {
+        setCoachConfig({ title: "خطة اليوم: تدريب حر على مقام " + maqam.name, targets: [],
+          freeScale: { name: maqam.name, tonicMidi: maqam.tonicMidi, semis: maqam.notes.map(function(n) { return n[1]; }) } });
+      });
+      b5.children[1].addEventListener("click", function() {
+        startCallResponse(maqam.id, "phrase", maqam.phrases.indexOf(phrase));
+      });
+      el("step-free").appendChild(b5);
+
+      paintPlanSteps();
+      paintPlanDone();
+      paintTimer();
+
+      el("timer-toggle").addEventListener("click", function() {
+        unlockAudio();
+        plan.running = !plan.running;
+        if (plan.running) {
+          plan.timerId = setInterval(function() {
+            plan.elapsed = Math.min(plan.elapsed + 1, TOTAL);
+            if (plan.elapsed >= TOTAL) { plan.running = false; clearInterval(plan.timerId); }
+            paintTimer(); paintPlanSteps();
+          }, 1000);
+        } else if (plan.timerId) clearInterval(plan.timerId);
+        paintTimer(); paintPlanSteps();
+      });
+      el("timer-reset").addEventListener("click", function() {
+        plan.elapsed = 0; plan.running = false;
+        if (plan.timerId) clearInterval(plan.timerId);
+        paintTimer(); paintPlanSteps();
+      });
+
+      function paintTimer() {
+        var clockEl = el("timer-clock"), stateEl = el("timer-state"), tog = el("timer-toggle"), rst = el("timer-reset"), prog = el("timer-progress");
+        if (!clockEl) return;
+        var done = plan.elapsed >= TOTAL;
+        clockEl.textContent = fmtClock(TOTAL - plan.elapsed);
+        stateEl.textContent = done ? "خلصت الربع ساعة 🎉" : plan.running ? "الجلسة شغالة…" : plan.elapsed > 0 ? "الجلسة واقفة مؤقتًا" : "جاهز تبدأ؟";
+        tog.textContent = plan.running ? "⏸ إيقاف مؤقت" : plan.elapsed > 0 ? "▶ كمّل" : "▶ ابدأ الجلسة";
+        tog.style.display = done ? "none" : "";
+        rst.classList.toggle("hidden", plan.elapsed === 0);
+        prog.setAttribute("aria-valuenow", plan.elapsed);
+        prog.firstElementChild.style.width = (plan.elapsed / TOTAL) * 100 + "%";
+      }
+      plan._paintTimer = paintTimer;
+
+      function paintPlanDone() {
+        var doneBox = el("plan-done-box");
+        if (!doneBox) return;
+        if (plan.dayDone) {
+          doneBox.innerHTML = "<p class='font-display' style='margin:0;font-size:1.2rem;font-weight:700'>✓ سجّلت تدريب النهارده — أحسنت! ارجع بكرة لمقام جديد.</p>";
+        } else {
+          doneBox.innerHTML =
+            "<div class='row-between'><p style='margin:0;font-weight:600'>خلّصت الخطوات؟ علّم اليوم كمكتمل.</p>" +
+            "<button type='button' class='btn-accent' id='plan-done-btn' style='min-height:3rem'>✓ خلّصت تدريب النهارده</button></div>";
+          el("plan-done-btn").addEventListener("click", function() { plan.dayDone = true; paintPlanDone(); });
+        }
+      }
+      plan._paintDone = paintPlanDone;
+    }
+
+    function paintPlanSteps() {
+      var TOTAL = 15 * 60;
+      var bounds = [0, 180, 360, 600, 780, 900];
+      var activeStep = plan.elapsed >= TOTAL ? -1 : -1;
+      for (var i = 0; i < 5; i++) { if (plan.elapsed < bounds[i + 1]) { activeStep = i; break; } }
+      var items = document.querySelectorAll("#plan-steps > li");
+      Array.prototype.forEach.call(items, function(li, i) {
+        var isActive = i === activeStep && (plan.running || plan.elapsed > 0);
+        li.classList.toggle("active", isActive);
+        li.style.opacity = plan.doneSteps[i] ? "0.75" : "1";
+        var num = li.querySelector(".step-num");
+        num.classList.toggle("done", !!plan.doneSteps[i]);
+        num.textContent = plan.doneSteps[i] ? "✓" : (i + 1);
+        var nowTag = li.querySelector("[data-now]");
+        if (nowTag) nowTag.classList.toggle("hidden", !isActive);
+      });
+    }
+
+    /* ════════════════ المحلل اللايف — Live Listen زي Maqam Analyzer ════════════════
+       تحليل حر: بيسمع أي عزف/غنا، يكشف النغمة + السنت + الربع تون،
+       وبيخمّن المقام من مجموع النغمات اللي سمعها. */
+    var analyzer = {
+      listening: false, starting: false, stream: null, analyser: null, ac: null, raf: 0,
+      smoother: new PitchSmoother(), detected: null, freq: null,
+      history: [], counts: {}, distinct: {}, holdQuarter: null, holdSince: null, lastAddedQuarter: null, lastAddedAt: 0
+    };
+    var anBtn = el("btn-analyzer"), anStatusEl = el("an-status"), anStatusText = el("an-status-text");
+    var anErrorEl = el("an-error"), anLiveEl = el("an-live");
+
+    function anSetStatus(state, text) {
+      anStatusEl.classList.toggle("live", state === "live");
+      anStatusEl.classList.toggle("err", state === "err");
+      anStatusText.textContent = text;
+    }
+    function anShowError(msg) {
+      if (msg) { anErrorEl.textContent = msg; anErrorEl.classList.remove("hidden"); }
+      else anErrorEl.classList.add("hidden");
+    }
+    function quarterOf(midi) { return Math.round(midi * 2) / 2; }
+    function quarterPc(midi) { var q = Math.round(midi * 2); return ((q % 24) + 24) % 24; }
+
+    function analyzerScores() {
+      var pcs = Object.keys(analyzer.distinct).map(Number);
+      if (pcs.length === 0) return [];
+      return MAQAMAT.map(function(m) {
+        var scalePcs = {};
+        m.notes.forEach(function(n) { scalePcs[quarterPc(m.tonicMidi + n[1])] = true; });
+        var matched = 0;
+        pcs.forEach(function(pc) { if (scalePcs[pc]) matched++; });
+        var precision = matched / pcs.length;
+        var coverage = matched / Object.keys(scalePcs).length;
+        var score = Math.round((precision * 0.55 + coverage * 0.45) * 100);
+        return { maqam: m, score: score, matched: matched, totalPcs: pcs.length };
+      }).sort(function(a, b) { return b.score - a.score; });
+    }
+
+    function renderAnalyzer() {
+      /* النغمة الحالية */
+      var noteEl = el("an-note"), freqEl = el("an-freq"), centsLine = el("an-cents-line");
+      var ball = el("an-gauge-ball"), centsLabel = el("an-cents-label");
+      if (analyzer.detected != null) {
+        var q = quarterOf(analyzer.detected);
+        var cents = Math.round((analyzer.detected - q) * 100);
+        noteEl.textContent = englishNoteName(q);
+        freqEl.textContent = Math.round(analyzer.freq || freqOf(analyzer.detected)) + " هرتز · أقرب نغمة مظبوطة: " + englishNoteName(q);
+        centsLine.textContent = Math.abs(cents) <= 25 ? "✓ مظبوطة — فرق " + cents + " سنت بس" : (cents > 0 ? "حاد +" + cents + " سنت — أعلى من الصح سنة" : "خافت " + cents + " سنت — أوطى من الصح سنة");
+        centsLine.style.color = Math.abs(cents) <= 25 ? "var(--good)" : "var(--warn)";
+        var pct = Math.max(-50, Math.min(50, cents)) + 50;
+        ball.style.left = "calc(" + pct + "% - 8px)";
+        ball.style.background = Math.abs(cents) <= 25 ? "#4caf7d" : "#ffd166";
+        centsLabel.textContent = (cents > 0 ? "+" + cents : cents) + " سنت";
+      } else {
+        noteEl.textContent = "—";
+        freqEl.textContent = analyzer.listening ? "المايك سامع بس مفيش نغمة ثابتة لسه — ثبّت على نغمة" : "مفيش صوت لسه";
+        centsLine.textContent = "";
+        ball.style.left = "calc(50% - 8px)";
+        centsLabel.textContent = "٠ سنت";
+      }
+      /* السجل */
+      var hist = el("an-history");
+      hist.innerHTML = "";
+      if (analyzer.history.length === 0) {
+        hist.innerHTML = "<span class='small dim'>مفيش نغمات متسجلة لسه</span>";
+      } else {
+        analyzer.history.slice(-28).forEach(function(h) {
+          var s = document.createElement("span");
+          s.className = "hist-chip" + (Math.abs(h.q * 2 - Math.round(h.q * 2)) < 0.01 && (Math.round(h.q * 2) % 2 !== 0) ? " qt" : "");
+          /* ربع التون = كوارتر مش عدد صحيح ولا نص صحيح؟ نتحقق من الكسر .5 على شبكة الربع */
+          var isQuarterTone = (Math.round(h.q * 2) % 2 !== 0);
+          s.className = "hist-chip" + (isQuarterTone ? " qt" : "");
+          s.textContent = h.name;
+          hist.appendChild(s);
+        });
+      }
+      el("an-count").textContent = analyzer.history.length ? (analyzer.history.length + " نغمة · " + Object.keys(analyzer.distinct).length + " نغمة مختلفة") : "";
+      /* تخمين المقام */
+      var guess = el("an-guess"), bars = el("an-bars");
+      var scores = analyzerScores();
+      bars.innerHTML = "";
+      if (scores.length === 0 || Object.keys(analyzer.distinct).length < 2) {
+        guess.innerHTML = "<p class='small dim' style='margin:0'>لسه مفيش نغمات كفاية — شغّل التحليل واعزف ٤ أو ٥ نغمات من نفس المقام (طالع نازل على مهلك) وهيبان التخمين هنا على طول.</p>";
+        return;
+      }
+      var top = scores[0];
+      guess.innerHTML = "<p style='margin:0;font-size:1.15rem'>أقرب مقام للي بتعزفه: <strong style='color:var(--accent)'>مقام " + esc(top.maqam.name) + "</strong> — تطابق " + top.score + "٪</p>" +
+        "<p class='small dim' style='margin:.25rem 0 0'>ركوز " + esc(top.maqam.name) + " هو " + esc(top.maqam.tonicName) + " · " + esc(top.maqam.mood) + ". سمع منك " + top.matched + " من نغمات سلّمه. لو النسبة قليلة، جرّب تعزف السلّم كله طالع نازل.</p>" +
+        "<div class='row' style='margin-top:.6rem'><button type='button' class='chip-btn' id='an-open-maqam'>افتح مقام " + esc(top.maqam.name) + " واتعلمه</button>" +
+        "<button type='button' class='chip-btn' id='an-coach-top'>🎤 اتدرّب عليه بالمايك</button></div>";
+      var openBtn = el("an-open-maqam");
+      if (openBtn) openBtn.addEventListener("click", function() { selectedMaqamId = top.maqam.id; renderMaqamPicker(); renderMaqamDetail(); showTab("maqamat"); });
+      var coachBtn = el("an-coach-top");
+      if (coachBtn) coachBtn.addEventListener("click", function() { stopAnalyzer(); setCoachConfig({ title: "تدريب مايك: سلم " + top.maqam.name + " صعودًا ونزولًا", targets: scaleTargets(top.maqam, true) }); });
+      scores.forEach(function(s, i) {
+        var row = document.createElement("div");
+        row.className = "maqam-bar-row" + (i === 0 ? " top" : "");
+        row.innerHTML = "<span class='maqam-bar-name small'>" + esc(s.maqam.name) + "</span>" +
+          "<span class='maqam-bar-track'><span class='maqam-bar-fill' style='display:block;width:" + s.score + "%'></span></span>" +
+          "<span class='small dim' style='text-align:left' dir='ltr'>" + s.score + "%</span>";
+        bars.appendChild(row);
+      });
+    }
+
+    function analyzerLoop() {
+      if (!analyzer.listening || !analyzer.analyser || !analyzer.ac) return;
+      var buf = new Float32Array(analyzer.analyser.fftSize);
+      analyzer.analyser.getFloatTimeDomainData(buf);
+      var rms = 0, i;
+      for (i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
+      rms = Math.sqrt(rms / buf.length);
+      var fill = el("an-level-fill");
+      fill.style.width = Math.min(100, Math.round(rms * 400)) + "%";
+      fill.style.background = rms >= 0.015 ? "#4caf7d" : "#7a6a4f";
+      el("an-level-text").textContent = rms >= 0.015 ? "المايك سامع صوت دلوقتي 🔊" : "المايك مفتوح بس مش سامع صوت لسه — قرّب الموبايل واعزف أقوى";
+      var f = autoCorrelate(buf, analyzer.ac.sampleRate);
+      if (f > 0) {
+        var rawMidi = 69 + 12 * Math.log2(f / 440);
+        var stable = analyzer.smoother.push(rawMidi);
+        if (stable != null) {
+          analyzer.detected = stable;
+          analyzer.freq = freqOf(stable);
+          var q = quarterOf(stable);
+          var now = performance.now();
+          if (analyzer.holdQuarter !== q) { analyzer.holdQuarter = q; analyzer.holdSince = now; }
+          else if (now - analyzer.holdSince >= 380 && !(analyzer.lastAddedQuarter === q && now - analyzer.lastAddedAt < 1400)) {
+            analyzer.lastAddedQuarter = q; analyzer.lastAddedAt = now;
+            analyzer.history.push({ q: q, name: englishNoteName(q) });
+            if (analyzer.history.length > 80) analyzer.history.shift();
+            analyzer.distinct[quarterPc(q)] = true;
+            analyzer.counts[q] = (analyzer.counts[q] || 0) + 1;
+          }
+        }
+      } else {
+        analyzer.smoother.push(null);
+        analyzer.detected = null; analyzer.freq = null; analyzer.holdQuarter = null; analyzer.holdSince = null;
+      }
+      renderAnalyzer();
+      analyzer.raf = requestAnimationFrame(analyzerLoop);
+    }
+
+    function stopAnalyzer() {
+      cancelAnimationFrame(analyzer.raf);
+      if (analyzer.stream) analyzer.stream.getTracks().forEach(function(t) { t.stop(); });
+      analyzer.stream = null; analyzer.listening = false; analyzer.detected = null; analyzer.freq = null;
+      analyzer.smoother.reset();
+      anLiveEl.classList.add("hidden");
+      anBtn.textContent = "🎤 ابدأ التحليل اللايف";
+      anBtn.className = "btn-accent";
+      anSetStatus("idle", "المحلل واقف");
+      renderAnalyzer();
+    }
+    function startAnalyzer() {
+      anShowError(null);
+      if (!window.isSecureContext || !navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== "function") {
+        anSetStatus("err", "المايك الحي غير مدعوم هنا");
+        anShowError(micErrorMessage(new Error("mic-unavailable")) + " افتح تبويب «المدرب اللايف» فوق عشان تشوف خطوات فتح الصفحة في Safari بالتفصيل.");
+        return;
+      }
+      if (typeof stopCoach === "function" && coach.listening) stopCoach();
+      analyzer.starting = true;
+      anBtn.disabled = true;
+      anBtn.textContent = "⏳ بيطلب إذن المايك…";
+      anSetStatus("idle", "بيطلب إذن المايك…");
+      requestMicStream().then(function(stream) {
+        analyzer.stream = stream;
+        var ac = getAudio();
+        return ac.resume().catch(function(){}).then(function() { return ac; });
+      }).then(function(ac) {
+        analyzer.ac = ac;
+        var source = ac.createMediaStreamSource(analyzer.stream);
+        var an = ac.createAnalyser(); an.fftSize = 2048;
+        source.connect(an);
+        analyzer.analyser = an;
+        analyzer.listening = true;
+        analyzer.smoother.reset();
+        anLiveEl.classList.remove("hidden");
+        anBtn.disabled = false;
+        anBtn.textContent = "⏹ إيقاف التحليل";
+        anBtn.className = "btn-stop";
+        anSetStatus("live", "🎙 بيحلّل لايف دلوقتي");
+        renderAnalyzer();
+        analyzer.raf = requestAnimationFrame(analyzerLoop);
+      }).catch(function(e) {
+        if (analyzer.stream) analyzer.stream.getTracks().forEach(function(t) { t.stop(); });
+        analyzer.stream = null; analyzer.listening = false;
+        anBtn.disabled = false;
+        anBtn.textContent = "🎤 ابدأ التحليل اللايف";
+        anBtn.className = "btn-accent";
+        anSetStatus("err", "المايك مافتحش");
+        anShowError(micErrorMessage(e));
+      }).then(function() { analyzer.starting = false; });
+    }
+    anBtn.addEventListener("click", function() {
+      unlockAudio();
+      if (analyzer.listening) stopAnalyzer();
+      else if (!analyzer.starting) startAnalyzer();
+    });
+    var gotoAn = el("btn-goto-analyzer");
+    if (gotoAn) gotoAn.addEventListener("click", function() { showTab("analyzer"); });
+    el("btn-analyzer-clear").addEventListener("click", function() {
+      analyzer.history = []; analyzer.counts = {}; analyzer.distinct = {};
+      analyzer.lastAddedQuarter = null; analyzer.holdQuarter = null;
+      renderAnalyzer();
+    });
+    window.addEventListener("pagehide", function() { if (analyzer.listening) stopAnalyzer(); });
+    renderAnalyzer();
+
+    /* ════════════════ التهيئة ════════════════ */
+    window.addEventListener("pointerdown", unlockAudio);
+    window.addEventListener("touchend", unlockAudio);
+
+    renderMaqamPicker();
+    renderMaqamDetail();
+    pickQuizRound();
+    renderQuiz();
+    renderDagherEar();
+    var glossaryBox = document.createElement("div");
+    glossaryBox.className = "card";
+    glossaryBox.id = "glossary";
+    glossaryBox.setAttribute("aria-label", "قاموس المصطلحات");
+    el("panel-maqamat").appendChild(glossaryBox);
+    renderGlossary(glossaryBox);
+
+    mainPiano = buildPiano(el("main-piano"), { low: 48, high: 76 });
+    pianoSeq = makeSequencer(function() {});
+    renderChordBuilder();
+    renderProgressions();
+    renderSolo();
+    renderPlan();
+
+    showTab("coach");
+    </script>
+  </body>
+</html>
