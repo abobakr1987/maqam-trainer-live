@@ -311,6 +311,13 @@
         display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem;
       }
       .sing-step.on .ss-num { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+      /* ── مدرّب الصوت ── */
+      .vt-canvas { width: 100%; height: 230px; display: block; background: var(--surface-alt); border: 1px solid var(--border); border-radius: .75rem; }
+      .vt-big-note { direction: ltr; text-align: center; font-size: 2.4rem; font-weight: 700; line-height: 1.15; margin: .15rem 0 0; }
+      .vt-select { font-family: inherit; font-size: 1rem; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: .6rem; padding: .35rem .5rem; width: 100%; }
+      .vt-field { display: flex; flex-direction: column; gap: .3rem; flex: 1 1 8.5rem; font-size: .9rem; }
+      .vt-check { display: inline-flex; align-items: center; gap: .4rem; padding-bottom: .45rem; }
     </style>
   </head>
   <body>
@@ -544,6 +551,133 @@
               <li>امسح، وجرّب سلّم تاني (حجاز مثلًا) وشوف التخمين بيتبدّل معاك لايف.</li>
             </ol>
           </div>
+        </div>
+      </section>
+
+      <!-- ══════════ مدرّب الصوت ══════════ -->
+      <section id="panel-vocal" class="hidden" aria-label="مدرّب الصوت">
+        <h1 class="page font-display">مدرّب الصوت — غنّي واتصحّح لايف</h1>
+        <p class="dim" style="margin:.3rem 0 0">
+          درّب صوتك زي ما بتتدرّب على آلة: المايك بيسمعك لايف ويرسم نغمتك قدامك، وبيقولك انت فين بالسنت من النغمة الصح — بأرباع التون الحقيقية بتاعة المقامات.
+          وفيه تمارين مقامات موجّهة: التطبيق يقول النغمة وانت تردّدها وراه، وهو يحسب درجتك. التحليل كله بيتم على جهازك وصوتك مش بيتبعت لأي مكان.
+        </p>
+
+        <div class="card">
+          <div class="row-between">
+            <h2 style="font-size:1.15rem">🎙️ صوتك لايف — شوف نغمتك وانت بتغنّي</h2>
+            <span class="mic-status" id="vt-status" role="status"><span class="mic-dot"></span><span id="vt-status-text">المايك واقف</span></span>
+          </div>
+          <p class="small dim" style="margin:.35rem 0 0">شغّل المايك وغنّي أي نغمة: الخط الأخضر هو صوتك آخر ٨ ثواني، والخطوط الأفقية هي النغمات — والخطوط الفاتحة اللي بينها دي أرباع التون. خلّي خطك ماشي على خط النغمة اللي قصدها.</p>
+          <div class="row" style="margin-top:.8rem">
+            <button type="button" class="btn-accent" id="btn-vt-mic" data-mic-start aria-label="بدء مايك مدرّب الصوت">🎤 ابدأ المايك</button>
+          </div>
+          <p class="alert-err hidden" id="vt-error" role="alert" style="margin-top:.75rem"></p>
+
+          <canvas id="vt-canvas" class="vt-canvas" style="margin-top:.9rem" aria-label="رسم لايف لنغمة صوتك آخر ٨ ثواني"></canvas>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-top:.9rem">
+            <div class="alt-box" style="text-align:center">
+              <p class="tiny dim" style="margin:0">النغمة اللي بتغنّيها</p>
+              <p class="vt-big-note" id="vt-note">—</p>
+            </div>
+            <div class="alt-box" style="text-align:center">
+              <p class="tiny dim" style="margin:0">التردد</p>
+              <p class="vt-big-note" id="vt-freq" style="font-size:1.6rem">—</p>
+            </div>
+            <div class="alt-box" style="text-align:center">
+              <p class="tiny dim" style="margin:0">بعدك عن أقرب نغمة</p>
+              <p class="vt-big-note" id="vt-cents" style="font-size:1.6rem">—</p>
+            </div>
+          </div>
+
+          <div class="meter" aria-label="مستوى صوت المايك في مدرّب الصوت" style="margin-top:.8rem"><div id="vt-level-fill"></div></div>
+
+          <div class="alt-box" style="margin-top:.9rem">
+            <p style="margin:0;font-weight:700">⏱ ثبات النغمة — اختبار النَّفَس والدقة</p>
+            <p class="small" style="margin:.3rem 0 0">ثبّت على أي نغمة من غير ما تهتز بره ±١٥ سنت: بتثبت دلوقتي من <strong id="vt-hold">0.0</strong> ثانية · أحسن ثبات لك: <strong id="vt-hold-best">0.0</strong> ثانية</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="font-display" style="font-size:1.3rem">🎵 نغمة مرجعية ثابتة (درون)</h2>
+          <p class="small dim" style="margin:.3rem 0 0">نغمة بتفضل شغالة وانت بتغنّي عليها — أحسن طريقة تظبط ودنك على الركوز. اختار النغمة وشغّلها، وممكن تضيف الخامسة والأوكتاف فوقها.</p>
+          <div class="row" style="margin-top:.7rem;align-items:flex-end">
+            <label class="vt-field">النغمة المرجعية
+              <select id="vt-drone-note" class="vt-select" aria-label="النغمة المرجعية"></select>
+            </label>
+            <label class="vt-check"><input type="checkbox" id="vt-drone-fifth"> + الخامسة</label>
+            <label class="vt-check"><input type="checkbox" id="vt-drone-oct"> + الأوكتاف</label>
+          </div>
+          <div class="row" style="margin-top:.7rem">
+            <button type="button" class="btn-accent" id="btn-vt-drone" aria-label="تشغيل أو إيقاف النغمة المرجعية">▶ شغّل الدرون</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="font-display" style="font-size:1.3rem">🎼 تمرين مقام موجّه — قول ورايا</h2>
+          <p class="small dim" style="margin:.3rem 0 0">اختار المقام ونغمة بداية تناسب طبقة صوتك: التطبيق هيقول كل نغمة من السلّم (صعودًا ونزولًا)، وبعد كل نغمة هيسكت ويسمعك وانت بتغنّيها، ويحسب درجتك على قد إيه فضلت مظبوط جوه حد الدقة. أي أوكتاف منك مقبول — بنقارن نغمتك بنفس النغمة على طبقتك.</p>
+          <p style="margin:.7rem 0 .2rem;font-weight:700">المقام</p>
+          <div class="row" id="vt-maqam-picker" role="group" aria-label="اختيار مقام التمرين"></div>
+          <div class="row" style="margin-top:.8rem;align-items:flex-end">
+            <label class="vt-field">نغمة البداية (على طبقتك)
+              <select id="vt-tonic" class="vt-select" aria-label="نغمة بداية التمرين"></select>
+            </label>
+            <label class="vt-field">الجولات
+              <select id="vt-rounds" class="vt-select" aria-label="عدد جولات التمرين">
+                <option value="1">جولة واحدة</option>
+                <option value="2">جولتين</option>
+                <option value="3">٣ جولات</option>
+              </select>
+            </label>
+            <label class="vt-field">السرعة
+              <select id="vt-speed" class="vt-select" aria-label="سرعة التمرين">
+                <option value="3400">بطيئة</option>
+                <option value="2600" selected>متوسطة</option>
+                <option value="1900">سريعة</option>
+              </select>
+            </label>
+            <label class="vt-field">الدقة المطلوبة
+              <select id="vt-acc" class="vt-select" aria-label="حد الدقة بالسنت">
+                <option value="40">±٤٠ سنت (متساهلة)</option>
+                <option value="25" selected>±٢٥ سنت (مظبوطة)</option>
+                <option value="15">±١٥ سنت (صارمة)</option>
+              </select>
+            </label>
+          </div>
+          <div class="row" style="margin-top:.9rem">
+            <button type="button" class="btn-accent" id="btn-vt-ex" data-mic-start aria-label="بدء تمرين المقام الموجّه">🎤 ابدأ التمرين</button>
+          </div>
+          <div id="vt-ex-ui" class="hidden" style="margin-top:.9rem">
+            <p id="vt-ex-phase" style="margin:0;text-align:center;font-weight:700;font-size:1.25rem">—</p>
+            <p class="small" id="vt-ex-note-line" dir="ltr" style="margin:.3rem 0 0;text-align:center;font-weight:700">—</p>
+            <div class="row" id="vt-ex-chips" style="gap:.4rem;margin-top:.6rem" aria-label="تقدم تمرين المقام"></div>
+            <p class="small" id="vt-ex-last" role="status" style="margin:.5rem 0 0;text-align:center"></p>
+          </div>
+          <div id="vt-ex-result" class="hidden" style="margin-top:.9rem;background:var(--good-bg);border-radius:.75rem;padding:1rem;text-align:center">
+            <p style="margin:0;font-size:1.25rem;font-weight:700;color:var(--good)" id="vt-ex-score">—</p>
+            <p class="small" id="vt-ex-tendency" style="margin:.3rem 0 0;color:#bfe9d2"></p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="font-display" style="font-size:1.3rem">🎤 مداك الصوتي</h2>
+          <p class="small dim" style="margin:.3rem 0 0">اعرف حدود صوتك: غنّي أوطى نغمة مريحة وثبّت عليها ثانية، وبعدين أعلى نغمة مريحة وثبّت عليها — من غير ما تزعق أو تتعب صوتك.</p>
+          <div class="row" style="margin-top:.7rem">
+            <button type="button" class="btn-accent" id="btn-vt-range" data-mic-start aria-label="بدء قياس المدى الصوتي">ابدأ قياس المدى</button>
+            <button type="button" class="btn-ghost" id="btn-vt-range-reset" aria-label="إعادة قياس المدى الصوتي">من الأول</button>
+          </div>
+          <p class="small" id="vt-range-status" role="status" style="margin:.6rem 0 0">المايك لازم يكون شغال — شغّله من كارت «صوتك لايف» فوق أو من زرار البدء هنا على طول.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.8rem">
+            <div class="alt-box" style="text-align:center">
+              <p class="tiny dim" style="margin:0">أوطى نغمة</p>
+              <p class="vt-big-note" id="vt-range-low" style="font-size:1.8rem">—</p>
+            </div>
+            <div class="alt-box" style="text-align:center">
+              <p class="tiny dim" style="margin:0">أعلى نغمة</p>
+              <p class="vt-big-note" id="vt-range-high" style="font-size:1.8rem">—</p>
+            </div>
+          </div>
+          <p class="small" id="vt-range-result" style="margin:.6rem 0 0;text-align:center;font-weight:700"></p>
         </div>
       </section>
 
@@ -1334,6 +1468,7 @@
       { id: "coach", label: "🎤 المدرب اللايف" },
       { id: "sing", label: "🗣️ مدرّس الغنا" },
       { id: "analyzer", label: "🔍 المحلل اللايف" },
+      { id: "vocal", label: "🎙️ مدرّب الصوت" },
       { id: "maqamat", label: "المقامات" },
       { id: "piano", label: "البيانو والكوردات" },
       { id: "plan", label: "📅 خطة اليوم" }
@@ -3160,6 +3295,479 @@
     });
     window.addEventListener("pagehide", function() { if (analyzer.listening) stopAnalyzer(); });
     renderAnalyzer();
+
+    /* ════════════════ مدرّب الصوت ════════════════
+       شاشة لايف لصوتك (رسم + اسم النغمة + السنت)، عدّاد ثبات، درون مرجعي،
+       تمارين مقامات موجّهة بتسمع وتصحّح، وقياس للمدى الصوتي. المايك بيُطلب
+       بنفس ترتيب المدرب والمحلل بالظبط: getUserMedia أول حاجة جوه الدوسة
+       وبأبسط إعدادات، والسياق الصوتي بعد الإذن — ومايك واحد بس في الصفحة. */
+    var vocal = {
+      listening: false, starting: false, stream: null, analyser: null, ac: null, raf: 0,
+      smoother: new PitchSmoother(), detected: null, freq: null, level: 0,
+      trace: [],
+      holdQ: null, holdSince: null, holdBest: 0,
+      droneOn: false, droneTimer: 0,
+      exMaqamId: "rast",
+      ex: { active: false, phase: "idle", seq: [], idx: 0, timer: 0, mutedUntil: 0,
+            listenEnd: 0, frames: 0, inFrames: 0, centsSum: 0, results: [], allCents: [] },
+      range: { mode: "idle", low: null, high: null, candQ: null, candSince: null }
+    };
+    var vtStatusEl = el("vt-status"), vtStatusText = el("vt-status-text");
+    var vtBtn = el("btn-vt-mic"), vtErrorEl = el("vt-error");
+    var vtCanvas = el("vt-canvas");
+
+    function vtSetStatus(state, text) {
+      vtStatusEl.classList.toggle("live", state === "live");
+      vtStatusEl.classList.toggle("err", state === "err");
+      vtStatusText.textContent = text;
+    }
+    function vtShowError(msg) {
+      if (msg) { vtErrorEl.textContent = msg; vtErrorEl.classList.remove("hidden"); }
+      else vtErrorEl.classList.add("hidden");
+    }
+    function vtNoteLabel(midi) { return englishNoteName(midi) + (Math.floor(midi / 12) - 1); }
+
+    /* ── المايك: نفس نمط المدرب والمحلل ── */
+    function vtStopMic() {
+      cancelAnimationFrame(vocal.raf);
+      if (vocal.stream) vocal.stream.getTracks().forEach(function(t) { t.stop(); });
+      vocal.stream = null;
+      closeMicContext(vocal);
+      vocal.listening = false; vocal.starting = false;
+      vocal.detected = null; vocal.freq = null; vocal.level = 0;
+      vocal.smoother.reset();
+      vocal.trace = [];
+      vocal.holdQ = null; vocal.holdSince = null;
+      vtExCancel();
+      if (vocal.range.mode === "low" || vocal.range.mode === "high") {
+        vocal.range.mode = "idle"; vocal.range.candQ = null;
+        vtRangeStatus("اتوقف المايك — شغّله وابدأ قياس المدى من الأول");
+      }
+      vtBtn.disabled = false;
+      vtBtn.textContent = "🎤 ابدأ المايك";
+      vtBtn.className = "btn-accent";
+      vtSetStatus("idle", "المايك واقف");
+      vtRenderReadout();
+    }
+    function vtStartMic(after) {
+      if (vocal.listening) { if (after) after(); return; }
+      if (vocal.starting) return;
+      vtShowError(null);
+      if (!window.isSecureContext || (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== "function") && typeof (navigator.getUserMedia || navigator.webkitGetUserMedia) !== "function") {
+        vtSetStatus("err", "المايك الحي غير مدعوم هنا");
+        vtShowError(micErrorMessage(new Error("mic-unavailable")) + " افتح تبويب «المدرب اللايف» فوق عشان تشوف خطوات فتح الصفحة في Safari بالتفصيل.");
+        return;
+      }
+      /* مايك واحد بس: وقّف المدرب والمحلل قبل أي ستريم جديد */
+      if (typeof stopCoach === "function" && (coach.listening || coach.starting)) stopCoach();
+      if (typeof stopAnalyzer === "function" && typeof analyzer !== "undefined" && analyzer && (analyzer.listening || analyzer.starting)) stopAnalyzer();
+      vocal.starting = true;
+      var streamPromise = requestMicStream();
+      vtBtn.disabled = true;
+      vtBtn.textContent = "⏳ بيطلب إذن المايك…";
+      vtSetStatus("idle", "بيطلب إذن المايك…");
+      streamPromise.then(function(stream) {
+        vocal.stream = stream;
+        /* السياق بيتعمل دلوقتي بس — بعد ما الستريم اتاخد فعلًا */
+        return createMicContext();
+      }).then(function(ac) {
+        vocal.ac = ac;
+        var source = ac.createMediaStreamSource(vocal.stream);
+        var an = ac.createAnalyser(); an.fftSize = 2048;
+        source.connect(an);
+        vocal.analyser = an;
+        vocal.listening = true;
+        vocal.smoother.reset();
+        vtBtn.disabled = false;
+        vtBtn.textContent = "⏹ إيقاف المايك";
+        vtBtn.className = "btn-stop";
+        vtSetStatus("live", "🎙 بيسمعك لايف دلوقتي");
+        vocal.raf = requestAnimationFrame(vtLoop);
+        if (after) after();
+      }).catch(function(e) {
+        if (vocal.stream) vocal.stream.getTracks().forEach(function(t) { t.stop(); });
+        vocal.stream = null;
+        closeMicContext(vocal);
+        vocal.listening = false;
+        vtBtn.disabled = false;
+        vtBtn.textContent = "🎤 ابدأ المايك";
+        vtBtn.className = "btn-accent";
+        vtSetStatus("err", "⚠ " + micErrorName(e));
+        vtShowError(micErrorMessage(e));
+      }).then(function() { vocal.starting = false; });
+    }
+    vtBtn.addEventListener("click", function() {
+      if (vocal.listening) vtStopMic();
+      else vtStartMic(null);
+    });
+    window.addEventListener("pagehide", function() { if (vocal.listening) vtStopMic(); });
+
+    function vtLoop() {
+      if (!vocal.listening || !vocal.analyser || !vocal.ac) return;
+      var buf = new Float32Array(vocal.analyser.fftSize);
+      vocal.analyser.getFloatTimeDomainData(buf);
+      var rms = 0, i;
+      for (i = 0; i < buf.length; i++) rms += buf[i] * buf[i];
+      rms = Math.sqrt(rms / buf.length);
+      vocal.level = rms;
+      var fill = el("vt-level-fill");
+      fill.style.width = Math.min(100, Math.round(rms * 400)) + "%";
+      fill.style.background = rms >= 0.015 ? "#4caf7d" : "#7a6a4f";
+      var now = performance.now();
+      var f = autoCorrelate(buf, vocal.ac.sampleRate);
+      var rawMidi = null;
+      if (f > 0) {
+        rawMidi = 69 + 12 * Math.log2(f / 440);
+        var stable = vocal.smoother.push(rawMidi);
+        if (stable != null) { vocal.detected = stable; vocal.freq = freqOf(stable); }
+      } else {
+        vocal.smoother.push(null);
+        vocal.detected = null; vocal.freq = null;
+      }
+      vocal.trace.push({ t: now, m: rawMidi });
+      while (vocal.trace.length && now - vocal.trace[0].t > 9000) vocal.trace.shift();
+      vtHoldUpdate(now);
+      vtExOnFrame(now);
+      vtRangeOnFrame(now);
+      vtRenderReadout();
+      vtDraw(now);
+      vocal.raf = requestAnimationFrame(vtLoop);
+    }
+
+    /* ── القراءة الكبيرة: الاسم + التردد + البعد بالسنت عن أقرب خط سلّم ── */
+    function vtRenderReadout() {
+      var noteEl = el("vt-note"), freqEl = el("vt-freq"), centsEl = el("vt-cents");
+      if (vocal.detected != null) {
+        var q = Math.round(vocal.detected * 2) / 2;
+        var cents = Math.round((vocal.detected - q) * 100);
+        noteEl.textContent = vtNoteLabel(q);
+        freqEl.textContent = Math.round(vocal.freq || freqOf(vocal.detected)) + " Hz";
+        centsEl.textContent = (cents > 0 ? "+" : "") + cents + "¢";
+        centsEl.style.color = Math.abs(cents) <= 25 ? "var(--good)" : "var(--warn)";
+      } else {
+        noteEl.textContent = "—";
+        freqEl.textContent = "—";
+        centsEl.textContent = "—";
+        centsEl.style.color = "";
+      }
+    }
+
+    /* ── عدّاد ثبات النغمة جوه ±١٥ سنت ── */
+    function vtHoldRender(held) {
+      el("vt-hold").textContent = held.toFixed(1);
+      el("vt-hold-best").textContent = vocal.holdBest.toFixed(1);
+    }
+    function vtHoldUpdate(now) {
+      var d = vocal.detected;
+      if (d == null) { vocal.holdQ = null; vocal.holdSince = null; vtHoldRender(0); return; }
+      var q = Math.round(d * 2) / 2;
+      if (Math.abs((d - q) * 100) <= 15) {
+        if (vocal.holdQ !== q) { vocal.holdQ = q; vocal.holdSince = now; }
+        var held = (now - vocal.holdSince) / 1000;
+        if (held > vocal.holdBest) vocal.holdBest = held;
+        vtHoldRender(held);
+      } else {
+        vocal.holdQ = null; vocal.holdSince = null; vtHoldRender(0);
+      }
+    }
+
+    /* ── رسم أثر الصوت آخر ٨ ثواني على خطوط النغمات وأرباع التون ── */
+    function vtDraw(now) {
+      var cv = vtCanvas;
+      if (!cv || currentTab !== "vocal") return;
+      var dpr = Math.min(2, window.devicePixelRatio || 1);
+      var W = cv.clientWidth, H = cv.clientHeight;
+      if (!W || !H) return;
+      if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) {
+        cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+      }
+      var ctx = cv.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      var lo = Infinity, hi = -Infinity, i;
+      for (i = 0; i < vocal.trace.length; i++) {
+        var pm = vocal.trace[i].m;
+        if (pm != null) { if (pm < lo) lo = pm; if (pm > hi) hi = pm; }
+      }
+      var exT = vtExTargetMidi();
+      if (exT != null) { if (exT < lo) lo = exT; if (exT > hi) hi = exT; }
+      if (!isFinite(lo)) { lo = 55; hi = 67; }
+      lo = Math.floor((lo - 1.5) * 2) / 2;
+      hi = Math.ceil((hi + 1.5) * 2) / 2;
+      if (hi - lo < 6) { var midA = (lo + hi) / 2; lo = midA - 3; hi = midA + 3; }
+      if (hi - lo > 26) { var midB = (lo + hi) / 2; lo = midB - 13; hi = midB + 13; }
+      function Y(m) { return H - ((m - lo) / (hi - lo)) * H; }
+      ctx.font = "10px system-ui, sans-serif";
+      for (var m = Math.ceil(lo * 2) / 2; m <= hi + 0.001; m += 0.5) {
+        var y = Y(m);
+        var isSemi = Math.abs(m - Math.round(m)) < 0.01;
+        ctx.strokeStyle = isSemi ? "rgba(160,135,90,0.45)" : "rgba(160,135,90,0.16)";
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+        ctx.fillStyle = "rgba(150,130,95,0.95)";
+        ctx.fillText(vtNoteLabel(m), 4, Math.max(9, y - 2));
+      }
+      if (exT != null) {
+        var ty = Y(exT);
+        ctx.strokeStyle = "#c9a227"; ctx.lineWidth = 2; ctx.setLineDash([6, 4]);
+        ctx.beginPath(); ctx.moveTo(0, ty); ctx.lineTo(W, ty); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      ctx.strokeStyle = "#4caf7d"; ctx.lineWidth = 2; ctx.beginPath();
+      var started = false, t0 = now - 8000;
+      for (i = 0; i < vocal.trace.length; i++) {
+        var p = vocal.trace[i];
+        if (p.t < t0) continue;
+        if (p.m == null) { started = false; continue; }
+        var x = ((p.t - t0) / 8000) * W, yy = Y(p.m);
+        if (!started) { ctx.moveTo(x, yy); started = true; } else ctx.lineTo(x, yy);
+      }
+      ctx.stroke();
+    }
+
+    /* ── الدرون المرجعي: نغمة ثابتة بتتكرر، مع خامسة وأوكتاف اختياريين ── */
+    function vtDroneTick() {
+      var base = parseFloat(el("vt-drone-note").value);
+      if (isNaN(base)) return;
+      playTone(base, 2.6, 0, 0.20);
+      if (el("vt-drone-fifth").checked) playTone(base + 7, 2.6, 0, 0.10);
+      if (el("vt-drone-oct").checked) playTone(base + 12, 2.6, 0, 0.08);
+    }
+    function vtDroneStop() {
+      if (vocal.droneTimer) clearInterval(vocal.droneTimer);
+      vocal.droneTimer = 0; vocal.droneOn = false;
+      var b = el("btn-vt-drone");
+      b.textContent = "▶ شغّل الدرون"; b.className = "btn-accent";
+    }
+    el("btn-vt-drone").addEventListener("click", function() {
+      if (vocal.droneOn) { vtDroneStop(); return; }
+      unlockAudio();
+      vocal.droneOn = true;
+      vtDroneTick();
+      vocal.droneTimer = setInterval(vtDroneTick, 2700);
+      var b = el("btn-vt-drone");
+      b.textContent = "⏹ وقّف الدرون"; b.className = "btn-stop";
+    });
+
+    /* ── تمرين المقام الموجّه: يقول النغمة، يصمت، يسمعك، يحسب ── */
+    function vtExTargetMidi() {
+      if (!vocal.ex.active || vocal.ex.idx >= vocal.ex.seq.length) return null;
+      return vocal.ex.seq[vocal.ex.idx].midi;
+    }
+    function vtExButtonReset() {
+      var b = el("btn-vt-ex");
+      b.textContent = "🎤 ابدأ التمرين"; b.className = "btn-accent";
+    }
+    function vtExCancel() {
+      if (vocal.ex.timer) clearTimeout(vocal.ex.timer);
+      vocal.ex.timer = 0;
+      vocal.ex.active = false; vocal.ex.phase = "idle";
+      vtExButtonReset();
+    }
+    function vtExBuildSeq() {
+      var m = maqamById(vocal.exMaqamId);
+      var tonic = parseFloat(el("vt-tonic").value);
+      if (isNaN(tonic)) tonic = 53;
+      var rounds = parseInt(el("vt-rounds").value, 10) || 1;
+      var up = m.notes.map(function(n) { return { label: n[0], midi: tonic + n[1] }; });
+      var down = m.notes.slice().reverse().slice(1).map(function(n) { return { label: n[0], midi: tonic + n[1] }; });
+      var one = up.concat(down), seq = [];
+      for (var r = 0; r < rounds; r++) seq = seq.concat(one);
+      return seq;
+    }
+    function vtExRenderChips() {
+      var box = el("vt-ex-chips");
+      box.innerHTML = "";
+      vocal.ex.seq.forEach(function(s, i) {
+        var c = document.createElement("span");
+        c.className = "hist-chip";
+        c.textContent = s.label;
+        c.setAttribute("dir", "ltr");
+        if (i < vocal.ex.results.length) {
+          var r = vocal.ex.results[i];
+          c.style.background = r.score >= 60 ? "var(--good-bg)" : "var(--bad-bg)";
+        } else if (i === vocal.ex.idx && vocal.ex.active) {
+          c.style.outline = "2px solid var(--accent)";
+        }
+        box.appendChild(c);
+      });
+    }
+    function vtExBegin() {
+      vocal.ex.seq = vtExBuildSeq();
+      vocal.ex.idx = 0; vocal.ex.results = []; vocal.ex.allCents = [];
+      vocal.ex.active = true; vocal.ex.phase = "play";
+      el("vt-ex-ui").classList.remove("hidden");
+      el("vt-ex-result").classList.add("hidden");
+      var b = el("btn-vt-ex");
+      b.textContent = "⏹ وقّف التمرين"; b.className = "btn-stop";
+      vtExRenderChips();
+      vtExPlayCurrent();
+    }
+    function vtExPlayCurrent() {
+      var ex = vocal.ex;
+      if (!ex.active) return;
+      if (ex.idx >= ex.seq.length) { vtExFinish(); return; }
+      var s = ex.seq[ex.idx];
+      ex.phase = "play";
+      el("vt-ex-phase").textContent = "🔊 اسمع النغمة…";
+      el("vt-ex-note-line").textContent = s.label;
+      el("vt-ex-last").textContent = "النغمة " + (ex.idx + 1) + " من " + ex.seq.length;
+      vtExRenderChips();
+      playTone(s.midi, 1.1, 0, 0.3);
+      /* الكاشف مكتوم طول ما النغمة الدليل شغالة وبعده بشوية */
+      ex.mutedUntil = performance.now() + 1450;
+      ex.timer = setTimeout(function() {
+        if (!vocal.ex.active) return;
+        vocal.ex.phase = "listen";
+        vocal.ex.frames = 0; vocal.ex.inFrames = 0; vocal.ex.centsSum = 0;
+        vocal.ex.listenEnd = performance.now() + (parseInt(el("vt-speed").value, 10) || 2600);
+        el("vt-ex-phase").textContent = "🎤 دورك — غنّيها";
+      }, 1500);
+    }
+    function vtExOnFrame(now) {
+      var ex = vocal.ex;
+      if (!ex.active || ex.phase !== "listen") return;
+      if (now >= ex.listenEnd) { vtExScoreCurrent(); return; }
+      if (now < ex.mutedUntil) return;
+      if (vocal.detected == null) return;
+      var s = ex.seq[ex.idx];
+      if (!s) return;
+      /* أي أوكتاف مقبول: بنطوي صوتك على نفس النغمة في أوكتاف الهدف */
+      var folded = foldToTarget(vocal.detected, s.midi);
+      var cents = (folded - s.midi) * 100;
+      ex.frames++; ex.centsSum += cents; ex.allCents.push(cents);
+      var acc = parseInt(el("vt-acc").value, 10) || 25;
+      if (Math.abs(cents) <= acc) ex.inFrames++;
+    }
+    function vtExScoreCurrent() {
+      var ex = vocal.ex;
+      var s = ex.seq[ex.idx];
+      if (!s) return;
+      var score = ex.frames > 0 ? Math.round(ex.inFrames / ex.frames * 100) : 0;
+      var avg = ex.frames > 0 ? Math.round(ex.centsSum / ex.frames) : 0;
+      ex.results.push({ label: s.label, score: score, avgCents: avg, heard: ex.frames > 0 });
+      el("vt-ex-last").textContent = ex.frames > 0
+        ? ("نغمة " + s.label + ": درجتك " + score + "٪" + (Math.abs(avg) >= 8 ? (avg > 0 ? " — ميلك فيها حاد +" + avg + " سنت" : " — ميلك فيها خافت " + avg + " سنت") : " — مظبوطة في النص"))
+        : ("نغمة " + s.label + ": مسمعتش صوتك فيها — الدرجة ٠٪");
+      ex.idx++;
+      ex.phase = "play";
+      vtExRenderChips();
+      ex.timer = setTimeout(function() { vtExPlayCurrent(); }, 650);
+    }
+    function vtExFinish() {
+      var ex = vocal.ex;
+      ex.active = false; ex.phase = "idle";
+      var total = 0;
+      ex.results.forEach(function(r) { total += r.score; });
+      var avgScore = ex.results.length ? Math.round(total / ex.results.length) : 0;
+      var sum = 0;
+      ex.allCents.forEach(function(c) { sum += c; });
+      var avgC = ex.allCents.length ? Math.round(sum / ex.allCents.length) : 0;
+      el("vt-ex-phase").textContent = "🏁 خلّصت التمرين";
+      el("vt-ex-note-line").textContent = "—";
+      el("vt-ex-score").textContent = "درجتك: " + avgScore + "٪";
+      el("vt-ex-tendency").textContent = !ex.allCents.length
+        ? "مسمعتش صوتك في التمرين ده — قرّب الموبايل منك وغنّي بصوت أوضح المرة الجاية."
+        : (avgC > 8
+          ? "ميلك العام: حاد — بتغنّي أعلى من الصح بشوية (متوسط +" + avgC + " سنت). جرّب تريّح صوتك سنة لتحت."
+          : (avgC < -8
+            ? "ميلك العام: خافت — بتغنّي أوطى من الصح بشوية (متوسط " + avgC + " سنت). جرّب ترفع صوتك سنة لفوق."
+            : "ميلك العام: مظبوط في النص — متوسط انحرافك " + (avgC > 0 ? "+" : "") + avgC + " سنت بس."));
+      el("vt-ex-result").classList.remove("hidden");
+      vtExButtonReset();
+      vtExRenderChips();
+    }
+    el("btn-vt-ex").addEventListener("click", function() {
+      if (vocal.ex.active) { vtExCancel(); return; }
+      if (vocal.listening) unlockAudio();
+      vtStartMic(function() { vtExBegin(); });
+    });
+
+    /* ── قياس المدى الصوتي: أوطى نغمة ثابتة، وبعدين أعلى نغمة ثابتة ── */
+    function vtRangeStatus(t) { el("vt-range-status").textContent = t; }
+    function vtRangeBegin() {
+      vocal.range.mode = "low";
+      vocal.range.low = null; vocal.range.high = null;
+      vocal.range.candQ = null; vocal.range.candSince = null;
+      el("vt-range-low").textContent = "—";
+      el("vt-range-high").textContent = "—";
+      el("vt-range-result").textContent = "";
+      vtRangeStatus("🎤 غنّي أوطى نغمة مريحة عندك وثبّت عليها ثانية…");
+    }
+    el("btn-vt-range").addEventListener("click", function() {
+      if (vocal.listening) { unlockAudio(); vtRangeBegin(); }
+      else vtStartMic(function() { vtRangeBegin(); });
+    });
+    el("btn-vt-range-reset").addEventListener("click", function() {
+      vocal.range.mode = "idle";
+      vocal.range.low = null; vocal.range.high = null; vocal.range.candQ = null;
+      el("vt-range-low").textContent = "—";
+      el("vt-range-high").textContent = "—";
+      el("vt-range-result").textContent = "";
+      vtRangeStatus("المايك لازم يكون شغال — شغّله من كارت «صوتك لايف» فوق أو من زرار البدء هنا على طول.");
+    });
+    function vtRangeOnFrame(now) {
+      var r = vocal.range;
+      if (r.mode !== "low" && r.mode !== "high") return;
+      if (vocal.detected == null) { r.candQ = null; r.candSince = null; return; }
+      var q = Math.round(vocal.detected * 2) / 2;
+      if (Math.abs((vocal.detected - q) * 100) > 30) { r.candQ = null; r.candSince = null; return; }
+      if (r.mode === "high" && r.low != null && q <= r.low) {
+        r.candQ = null; r.candSince = null;
+        vtRangeStatus("دي أوطى من أوطى نغمة سجلتها أو قدها بالظبط — اطلع أعلى منها");
+        return;
+      }
+      if (r.candQ !== q) { r.candQ = q; r.candSince = now; return; }
+      if (now - r.candSince < 800) return;
+      if (r.mode === "low") {
+        r.low = q;
+        el("vt-range-low").textContent = vtNoteLabel(q);
+        r.mode = "high"; r.candQ = null; r.candSince = null;
+        vtRangeStatus("تمام، اتسجلت أوطى نغمة: " + vtNoteLabel(q) + " — دلوقتي غنّي أعلى نغمة مريحة وثبّت عليها");
+      } else {
+        r.high = q;
+        el("vt-range-high").textContent = vtNoteLabel(q);
+        r.mode = "done"; r.candQ = null;
+        var span = r.high - r.low;
+        el("vt-range-result").textContent = "مداك الصوتي: من " + vtNoteLabel(r.low) + " لـ " + vtNoteLabel(r.high) + " — " + span.toFixed(1) + " نص تون" + (span >= 12 ? " (أكتر من أوكتاف كامل)" : "");
+        vtRangeStatus("اتقاس مداك — دوس «من الأول» لو عايز تعيد القياس");
+      }
+    }
+
+    /* ── تجهيز مدرّب الصوت: أزرار المقامات وقوائم النغمات ── */
+    (function buildVtMaqamPicker() {
+      var box = el("vt-maqam-picker");
+      MAQAMAT.forEach(function(m) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "pill-btn" + (m.id === vocal.exMaqamId ? " on" : "");
+        b.textContent = m.name;
+        b.setAttribute("aria-label", "تمرين مقام " + m.name);
+        b.setAttribute("aria-pressed", m.id === vocal.exMaqamId ? "true" : "false");
+        b.addEventListener("click", function() {
+          vocal.exMaqamId = m.id;
+          Array.prototype.forEach.call(box.children, function(c, i) {
+            var on = MAQAMAT[i].id === m.id;
+            c.classList.toggle("on", on);
+            c.setAttribute("aria-pressed", on ? "true" : "false");
+          });
+        });
+        box.appendChild(b);
+      });
+    })();
+    function vtFillNoteSelect(sel, lo, hi, def) {
+      for (var m = lo; m <= hi + 0.001; m += 0.5) {
+        var o = document.createElement("option");
+        o.value = m;
+        o.textContent = vtNoteLabel(m);
+        if (Math.abs(m - def) < 0.01) o.selected = true;
+        sel.appendChild(o);
+      }
+    }
+    vtFillNoteSelect(el("vt-drone-note"), 43, 72, 48);
+    vtFillNoteSelect(el("vt-tonic"), 43, 67, 53);
+    vtRenderReadout();
+    vtHoldRender(0);
 
     /* ════════════════ التهيئة ════════════════ */
     /* فتح الصوت العام بيتخطّى أزرار تشغيل المايك خالص: أي دوسة على زرار
